@@ -1,0 +1,6 @@
+{
+  "name": "Fayda Clips AI",
+  "description": "Turn long videos into viral shorts. Paste a YouTube link and let AI automatically create engaging short-form content in seconds.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
