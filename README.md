@@ -8,6 +8,13 @@ This contains everything you need to run your app locally.
 
 View your app in AI Studio: https://ai.studio/apps/32e520ae-2a13-4062-8b74-69f5241676c2
 
+## Documentation
+
+- [Book Whispers — Platform Requirement Document](docs/REQUIREMENTS.md) — including **Section 11: Enterprise
+  E-Commerce Engine & Digital Publishing Architecture**, with companion
+  [data model](docs/architecture/data-model.md), [API contracts](docs/architecture/api-contracts.md) and
+  [design system](docs/design/design-system.md).
+
 ## Run Locally
 
 **Prerequisites:**  Node.js
