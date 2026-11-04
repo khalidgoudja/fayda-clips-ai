@@ -2,22 +2,25 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ── Brand tokens (AfriVue Info Brand Identity Guide v1.0) ── */
+/* ── AfriVue Info design tokens ── */
 @theme {
+  /* UI / labels (brand) · editorial headlines + reading (serif) · Arabic */
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --font-arabic: "Cairo", "Tajawal", ui-sans-serif, system-ui, sans-serif;
+  --font-naskh: "Noto Naskh Arabic", "Amiri", serif;
 
-  --color-navy: #0b2545;      /* Deep Navy – primary */
-  --color-navy-700: #13355f;
-  --color-gold: #c89b3c;      /* Sahel Gold – accent / CTAs */
-  --color-gold-300: #e2c27f;
-  --color-terracotta: #b5502d;/* Terracotta – tags, live */
-  --color-paper: #f7f4ef;     /* Paper – page background */
-  --color-ink: #1c1c1c;       /* Ink – body text */
-  --color-verified: #2f6d4f;  /* Verified Green – fact-check */
+  --color-navy: #0b2545;
+  --color-navy-800: #0f2e52;
+  --color-navy-950: #061528;
+  --color-emerald: #03a677;      /* logo green — accents, marks, active states */
+  --color-emerald-700: #027a57;  /* readable emerald for text & buttons on light */
+  --color-emerald-300: #5fd3ad;  /* readable emerald on navy */
+  --color-terracotta: #b5502d;   /* breaking-news only */
+  --color-paper: #f8f6f1;
+  --color-ink: #1c1c1c;
 }
 
-/* Semantic tokens that switch with the theme */
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -29,30 +32,30 @@
 }
 
 :root {
-  --bg: #f7f4ef;
+  --bg: #f8f6f1;
   --surface: #ffffff;
-  --fg: #1c1c1c;
-  --muted: #5a6270;
-  --line: #e3dccf;
+  --fg: #1f2328;
+  --muted: #5d6570;
+  --line: #e2ddd3;
   --heading: #0b2545;
-  --accent: #8a6820; /* gold darkened for readable text on paper */
+  --accent: #027a57;
   color-scheme: light;
 }
 
 .dark {
-  --bg: #061528;
-  --surface: #0c2342;
-  --fg: #e8e3d9;
-  --muted: #a1abb9;
-  --line: #1d3a60;
-  --heading: #f7f4ef;
-  --accent: #dcb465;
+  --bg: #071426;
+  --surface: #0c1f38;
+  --fg: #e6e2da;
+  --muted: #9ea8b6;
+  --line: #1c3354;
+  --heading: #f5f2ec;
+  --accent: #5fd3ad;
   color-scheme: dark;
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 72px;
 }
 
 body {
@@ -61,119 +64,123 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Arabic edition: Cairo/Tajawal instead of Poppins (no Arabic glyphs) */
-html[lang="ar"] body {
+/* Editorial headline + reading faces */
+.font-display {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  letter-spacing: -0.012em;
+}
+.font-reading {
+  font-family: var(--font-serif);
+}
+
+/* Arabic edition: Cairo for UI & headlines, Naskh for long reading */
+html[lang="ar"] body,
+html[lang="ar"] .font-display {
   font-family: var(--font-arabic);
+  letter-spacing: 0;
+}
+html[lang="ar"] .font-reading {
+  font-family: var(--font-naskh);
 }
 
 ::selection {
-  background: var(--color-gold);
-  color: var(--color-navy);
+  background: var(--color-emerald);
+  color: #fff;
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-gold);
+  outline: 2px solid var(--color-emerald);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
-/* Captions / labels — Poppins Medium, letter-spaced */
-.label {
-  font-weight: 500;
-  font-size: 0.7rem;
-  letter-spacing: 0.18em;
+/* Kicker / label style */
+.kicker {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-/* Letter-spacing breaks Arabic letter joining */
-html[lang="ar"] .label {
+html[lang="ar"] .kicker {
+  font-family: var(--font-arabic);
   letter-spacing: 0;
   font-size: 0.8rem;
-  font-weight: 600;
-}
-
-/* Headline links: animated underline */
-.headline-link {
-  background-image: linear-gradient(var(--color-gold), var(--color-gold));
-  background-size: 0% 2px;
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  transition: background-size 0.3s ease;
-}
-[dir="rtl"] .headline-link {
-  background-position: 100% 100%;
-}
-.group:hover .headline-link,
-.headline-link:hover {
-  background-size: 100% 2px;
-}
-
-/* Article body typography */
-.prose-article p {
-  margin-bottom: 1.4em;
-}
-.prose-article > p:first-of-type::first-letter {
-  float: left;
-  font-size: 3.6em;
-  line-height: 0.9;
   font-weight: 700;
-  color: var(--color-gold);
-  margin: 0.08em 0.12em 0 0;
 }
-[dir="rtl"] .prose-article > p:first-of-type::first-letter {
+.tracking-wide-label {
+  letter-spacing: 0.14em;
+}
+html[lang="ar"] .tracking-wide-label {
+  letter-spacing: 0;
+}
+
+/* Headline hover: thin underline, no colour jump */
+.hl {
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: text-decoration-color 0.2s ease;
+}
+.group:hover .hl,
+.hl:hover,
+.hl:focus-visible {
+  text-decoration-color: currentColor;
+}
+
+/* Restrained image zoom */
+.zoom > * {
+  transition: transform 0.7s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+.group:hover .zoom > * {
+  transform: scale(1.03);
+}
+
+/* Article typography */
+.article-body > p {
+  margin: 0 0 1.35em;
+}
+.article-body > p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--font-serif);
+  font-size: 3.7em;
+  line-height: 0.82;
+  font-weight: 700;
+  color: var(--heading);
+  margin: 0.06em 0.1em 0 0;
+}
+html[lang="ar"] .article-body > p:first-of-type::first-letter {
   float: none;
-  font-size: inherit;
-  margin: 0;
+  font: inherit;
   color: inherit;
-  font-weight: inherit;
+  margin: 0;
 }
 
-/* Breaking-news ticker */
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-@keyframes marquee-rtl {
-  from { transform: translateX(0); }
-  to { transform: translateX(50%); }
-}
-.ticker-track {
-  animation: marquee 60s linear infinite;
-}
-[dir="rtl"] .ticker-track {
-  animation-name: marquee-rtl;
-}
-.ticker:hover .ticker-track,
-.ticker:focus-within .ticker-track {
-  animation-play-state: paused;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
-}
-.live-dot {
-  animation: pulse-dot 1.6s ease-in-out infinite;
-}
-
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(8px); }
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
 }
-.fade-up {
-  animation: fade-up 0.45s ease both;
+.fade-in {
+  animation: fade-in 0.45s ease both;
+}
+@keyframes ticker-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+.ticker-in {
+  animation: ticker-in 0.4s ease both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
-  .ticker-track { animation: none !important; }
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }

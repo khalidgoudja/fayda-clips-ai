@@ -1,98 +1,125 @@
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
-import { ArrowLeft, Check, Facebook, Link2, Mail, MapPin, Minus, Plus, Send } from 'lucide-react';
-import { ARTICLES, SECTIONS, SITE, VIDEOS, byDate, type Article, type ArticleType, type Section, type Video } from '../data';
-import { formatDate, useI18n } from '../i18n';
+import { useMemo, useState, type FormEvent, type ReactNode } from 'react';
+import { Check, Mail, Send } from 'lucide-react';
+import { AFRICA_REGIONS, ANALYSIS_FORMATS, AUTHORS, MEDIA, SITE, sortedArticles, type Article, type AuthorId, type Format, type Media, type MediaType, type Region, type Topic } from '../data';
+import { useI18n } from '../i18n';
 import { Link } from '../router';
-import { ArticleCard, ArticleRow, Cover, Logo, MetaLine, SectionHeading, SectionTag, VerifiedBadge } from '../components/ui';
-import { Newsletter, SocialLinks } from '../components/layout';
-import { VideoCard } from './Home';
+import { Avatar, Chips, Cover, Logo, MediaCard, SocialLinks, StoryCard, StoryRow } from '../components/ui';
+import { useModal } from '../components/layout';
+import { ReportFeature, Wrap } from './Home';
 
-/* ── Shared page hero ── */
-function PageHero({ kicker, title, intro, children }: { kicker?: string; title: string; intro: string; children?: ReactNode }) {
+/* ── Page hero ── */
+function PageHero({ kicker, title, intro, children, dark = false }: { kicker?: string; title: string; intro?: string; children?: ReactNode; dark?: boolean }) {
   return (
-    <section className="relative overflow-hidden border-b border-line bg-surface">
-      <div className="pointer-events-none absolute -end-20 -top-20 h-64 w-64 rounded-full border-[36px] border-gold/10" aria-hidden />
-      <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
-        {kicker && <p className="label mb-3 text-terracotta dark:text-gold-300">{kicker}</p>}
-        <h1 className="text-4xl font-bold tracking-tight text-heading sm:text-5xl">{title}</h1>
-        <span className="mt-5 block h-1 w-16 bg-gold" aria-hidden />
-        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">{intro}</p>
-        {children}
-      </div>
+    <section className={dark ? 'bg-navy-950' : 'border-b border-line'}>
+      <Wrap className="pb-6 pt-10 sm:pt-14">
+        {kicker && <p className={`kicker ${dark ? 'text-emerald-300' : 'text-accent'}`}>{kicker}</p>}
+        <h1 className={`font-display mt-2 text-[2.6rem] font-bold leading-[1.05] sm:text-[3.4rem] ${dark ? 'text-white' : 'text-heading'}`}>{title}</h1>
+        {intro && <p className={`mt-4 max-w-2xl text-[1.1rem] leading-relaxed ${dark ? 'text-white/70' : 'text-muted'}`}>{intro}</p>}
+        {children && <div className="mt-7">{children}</div>}
+      </Wrap>
     </section>
   );
 }
 
-function Chips<T extends string>({ value, options, onChange, label }: { value: T; options: { v: T; l: string }[]; onChange: (v: T) => void; label: string }) {
-  return (
-    <div role="tablist" aria-label={label} className="no-scrollbar flex gap-2 overflow-x-auto">
-      {options.map((o) => (
-        <button
-          key={o.v}
-          role="tab"
-          aria-selected={value === o.v}
-          onClick={() => onChange(o.v)}
-          className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition ${
-            value === o.v ? 'border-navy bg-navy text-white dark:border-gold dark:bg-gold dark:text-navy' : 'border-line text-muted hover:border-navy hover:text-heading'
-          }`}
-        >
-          {o.l}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-/* ── Chad / Sahel / Africa ── */
-export function SectionPage({ section }: { section: Section }) {
+const Empty = () => {
   const { t } = useI18n();
-  const [type, setType] = useState<'all' | ArticleType>('all');
-  const all = useMemo(() => ARTICLES.filter((a) => a.section === section).sort(byDate), [section]);
-  const list = all.filter((a) => type === 'all' || a.type === type);
-  const [first, ...rest] = list;
-  const others = ARTICLES.filter((a) => a.section !== section).sort(byDate).slice(0, 4);
+  return <p className="border border-dashed border-line p-10 text-center text-muted">{t.ui.noResults}</p>;
+};
 
+/* ── Story listing: lead + side + grid + most read ── */
+function Listing({ items }: { items: Article[] }) {
+  const { t } = useI18n();
+  const mostRead = useMemo(() => [...items].sort((a, b) => b.views - a.views).slice(0, 5), [items]);
+  if (!items.length)
+    return (
+      <Wrap className="py-12">
+        <Empty />
+      </Wrap>
+    );
+  const [lead, ...rest] = items;
   return (
-    <>
-      <PageHero kicker={`${all.length} ${t.ui.stories}`} title={t.sections[section].title} intro={t.sections[section].intro}>
-        <div className="mt-8">
-          <Chips
-            label={t.sections[section].title}
-            value={type}
-            onChange={setType}
-            options={[
-              { v: 'all', l: t.ui.all },
-              { v: 'news', l: t.ui.news },
-              { v: 'analysis', l: t.ui.analysis },
-            ]}
-          />
-        </div>
-      </PageHero>
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-12">
-        <div className="lg:col-span-8" key={type}>
-          {first ? (
-            <>
-              <ArticleCard a={first} size="lg" />
-              <div className="mt-12 grid gap-x-6 gap-y-10 sm:grid-cols-2">
-                {rest.map((a) => (
-                  <ArticleCard key={a.slug} a={a} />
-                ))}
-              </div>
-            </>
-          ) : (
-            <p className="rounded-lg border border-dashed border-line p-10 text-center text-muted">{t.ui.noResults}</p>
+    <Wrap className="py-10">
+      <div className="grid gap-10 lg:grid-cols-12">
+        <div className="lg:col-span-8">
+          <StoryCard a={lead} variant="feature" />
+          {rest.length > 0 && (
+            <div className="mt-12 grid gap-x-6 gap-y-10 border-t border-line pt-10 sm:grid-cols-2">
+              {rest.map((a) => (
+                <StoryCard key={a.slug} a={a} />
+              ))}
+            </div>
           )}
         </div>
         <aside className="lg:col-span-4">
-          <div className="rounded-lg border border-line bg-surface p-5 lg:sticky lg:top-20">
-            <h2 className="label mb-1 text-heading">{t.home.regions}</h2>
-            {others.map((a) => (
-              <ArticleRow key={a.slug} a={a} />
+          <div className="border-t-[3px] border-navy pt-3 lg:sticky lg:top-20 dark:border-emerald">
+            <h2 className="font-display mb-5 text-xl font-bold text-heading">{t.ui.mostRead}</h2>
+            {mostRead.map((a, i) => (
+              <StoryRow key={a.slug} a={a} n={i + 1} thumb />
             ))}
           </div>
         </aside>
       </div>
-      <Newsletter />
+    </Wrap>
+  );
+}
+
+/* ── Chad ── */
+export function ChadPage() {
+  const { t } = useI18n();
+  const all = useMemo(() => sortedArticles().filter((a) => a.region === 'chad'), []);
+  const topics = (['politics', 'economy', 'society', 'development', 'culture', 'sports', 'technology'] as Topic[]).filter((tp) => all.some((a) => a.topic === tp));
+  const [tp, setTp] = useState<'all' | Topic>('all');
+  return (
+    <>
+      <PageHero kicker={`${all.length} ${t.ui.stories}`} title={t.nav.chad} intro={t.intros.chad}>
+        <Chips label={t.nav.chad} value={tp} onChange={setTp} options={[{ v: 'all' as const, l: t.ui.all }, ...topics.map((x) => ({ v: x, l: t.nav[x] }))]} />
+      </PageHero>
+      <div key={tp}>
+        <Listing items={all.filter((a) => tp === 'all' || a.topic === tp)} />
+      </div>
+    </>
+  );
+}
+
+/* ── Africa (regional filter) ── */
+export function AfricaPage({ initial }: { initial?: Region }) {
+  const { t } = useI18n();
+  const all = useMemo(() => sortedArticles().filter((a) => a.region !== 'chad'), []);
+  const [r, setR] = useState<'all' | Region>(initial && AFRICA_REGIONS.includes(initial) ? initial : 'all');
+  return (
+    <>
+      <PageHero kicker={t.home.africaToday} title={t.nav.africa} intro={t.intros.africa}>
+        <Chips label={t.ui.region} value={r} onChange={setR} options={[{ v: 'all' as const, l: t.ui.all }, ...AFRICA_REGIONS.map((x) => ({ v: x, l: t.regions[x] }))]} />
+      </PageHero>
+      <div key={r}>
+        <Listing items={all.filter((a) => r === 'all' || a.region === r)} />
+      </div>
+    </>
+  );
+}
+
+/* ── Topic (Politics, Economy, …) ── */
+export function TopicPage({ topic }: { topic: Topic }) {
+  const { t } = useI18n();
+  const all = useMemo(() => sortedArticles().filter((a) => a.topic === topic || (topic === 'society' && a.topic === 'development')), [topic]);
+  const [scope, setScope] = useState<'all' | 'chad' | 'africa'>('all');
+  return (
+    <>
+      <PageHero kicker={`${all.length} ${t.ui.stories}`} title={t.nav[topic]} intro={t.intros[topic]}>
+        <Chips
+          label={t.ui.region}
+          value={scope}
+          onChange={setScope}
+          options={[
+            { v: 'all', l: t.ui.all },
+            { v: 'chad', l: t.nav.chad },
+            { v: 'africa', l: t.nav.africa },
+          ]}
+        />
+      </PageHero>
+      <div key={scope}>
+        <Listing items={all.filter((a) => scope === 'all' || (scope === 'chad' ? a.region === 'chad' : a.region !== 'chad'))} />
+      </div>
     </>
   );
 }
@@ -100,453 +127,297 @@ export function SectionPage({ section }: { section: Section }) {
 /* ── Analysis ── */
 export function AnalysisPage() {
   const { t, lang } = useI18n();
-  const [region, setRegion] = useState<'all' | Section>('all');
-  const list = ARTICLES.filter((a) => a.type === 'analysis' && (region === 'all' || a.section === region)).sort(byDate);
+  const all = useMemo(() => sortedArticles().filter((a) => ANALYSIS_FORMATS.includes(a.format)), []);
+  const [f, setF] = useState<'all' | Format>('all');
+  const contributors = [...new Set(all.map((a) => a.author))].map((id) => AUTHORS[id]).filter((a) => !a.desk);
   return (
     <>
-      <PageHero kicker={t.home.analysisBand} title={t.analysisPage.title} intro={t.analysisPage.intro}>
-        <div className="mt-8">
-          <Chips label={t.analysisPage.title} value={region} onChange={setRegion} options={[{ v: 'all', l: t.ui.all }, ...SECTIONS.map((s) => ({ v: s, l: t.nav[s] }))]} />
-        </div>
+      <PageHero dark kicker={t.home.analysis} title={t.nav.analysis} intro={t.intros.analysis}>
+        <ul className="mb-8 flex flex-wrap gap-x-8 gap-y-4">
+          {contributors.map((au) => (
+            <li key={au.id}>
+              <Link to={`/author/${au.id}`} className="group flex items-center gap-3">
+                <Avatar author={au} size="md" ring />
+                <span className="text-[13px] leading-tight">
+                  <span className="block font-semibold text-white group-hover:underline">{au.name[lang]}</span>
+                  <span className="text-white/55">{au.role[lang]}</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <Chips light label={t.ui.type} value={f} onChange={setF} options={[{ v: 'all' as const, l: t.ui.all }, ...ANALYSIS_FORMATS.map((x) => ({ v: x, l: t.formats[x] }))]} />
       </PageHero>
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6" key={region}>
-        {list.length === 0 && <p className="rounded-lg border border-dashed border-line p-10 text-center text-muted">{t.ui.noResults}</p>}
-        {list.map((a) => (
-          <article key={a.slug} className="group fade-up grid gap-6 border-b border-line py-10 first:pt-0 last:border-0 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center">
-            <Link to={`/article/${a.slug}`} tabIndex={-1} aria-hidden className="block overflow-hidden rounded-lg">
-              <Cover art={a.art} section={a.section} className="aspect-[4/3]" />
-            </Link>
-            <div>
-              <div className="mb-3 flex items-center gap-2">
-                <SectionTag section={a.section} />
-                <span className="label text-muted">{t.desks[a.desk].t}</span>
-              </div>
-              <h2 className="text-2xl font-bold leading-snug text-heading sm:text-3xl">
-                <Link to={`/article/${a.slug}`} className="headline-link">
-                  {a.i18n[lang].title}
-                </Link>
-              </h2>
-              <p className="mt-3 leading-relaxed text-muted">{a.i18n[lang].excerpt}</p>
-              <MetaLine a={a} className="mt-4" />
-            </div>
-          </article>
-        ))}
+      <div key={f}>
+        <Listing items={all.filter((a) => f === 'all' || a.format === f)} />
       </div>
-      <Newsletter />
     </>
   );
 }
 
-/* ── Videos ── */
-export function VideosPage({ onPlay }: { onPlay: (v: Video) => void }) {
+/* ── In Depth (special reports) ── */
+export function InDepthPage() {
   const { t } = useI18n();
-  const [region, setRegion] = useState<'all' | Section>('all');
-  const list = VIDEOS.filter((v) => region === 'all' || v.section === region).sort(byDate);
+  const reports = useMemo(() => sortedArticles().filter((a) => a.format === 'report'), []);
   return (
     <>
-      <section className="bg-[#081c35]">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
-          <p className="label mb-3 text-gold">{t.home.videosBand}</p>
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">{t.videosPage.title}</h1>
-          <span className="mt-5 block h-1 w-16 bg-gold" aria-hidden />
-          <p className="mt-5 max-w-2xl text-lg text-paper/75">{t.videosPage.intro}</p>
-          <div className="mt-8 [&_button[aria-selected=false]]:border-white/20 [&_button[aria-selected=false]]:text-paper/75 [&_button[aria-selected=true]]:border-gold [&_button[aria-selected=true]]:bg-gold [&_button[aria-selected=true]]:text-navy">
-            <Chips label={t.videosPage.title} value={region} onChange={setRegion} options={[{ v: 'all', l: t.ui.all }, ...SECTIONS.map((s) => ({ v: s, l: t.nav[s] }))]} />
-          </div>
-          <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" key={region}>
-            {list.map((v, i) => (
-              <div key={v.id} className={`fade-up ${i === 0 && region === 'all' ? 'sm:col-span-2 lg:col-span-2 lg:row-span-2' : ''}`}>
-                <VideoCard v={v} big={i === 0 && region === 'all'} onPlay={onPlay} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      <Newsletter />
+      <PageHero kicker={t.home.specialReports} title={t.nav.indepth} intro={t.intros.indepth} />
+      <Wrap className="space-y-16 py-14">{reports.length ? reports.map((a, i) => <ReportFeature key={a.slug} a={a} flip={i % 2 === 1} />) : <Empty />}</Wrap>
     </>
   );
 }
 
-export function VideoModal({ video, onClose }: { video: Video | null; onClose: () => void }) {
-  const { t, lang } = useI18n();
-  useEffect(() => {
-    if (!video) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [video, onClose]);
-  if (!video) return null;
+/* ── Video / multimedia ── */
+export function VideoPage({ onOpen }: { onOpen: (m: Media) => void }) {
+  const { t } = useI18n();
+  const [type, setType] = useState<'all' | MediaType>('all');
+  const list = MEDIA.filter((m) => type === 'all' || m.type === type);
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={video.title[lang]} onClick={onClose}>
-      <div className="fade-up w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+    <section className="bg-navy-950 pb-16">
+      <PageHero dark kicker={t.home.multimedia} title={t.nav.video} intro={t.intros.video}>
+        <Chips light label={t.ui.type} value={type} onChange={setType} options={[{ v: 'all' as const, l: t.ui.all }, ...(['video', 'interview', 'podcast', 'photo'] as MediaType[]).map((m) => ({ v: m, l: t.media[m] }))]} />
+      </PageHero>
+      <Wrap className="pt-6">
+        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" key={type}>
+          {list.map((m, i) => (
+            <div key={m.id} className={`fade-in ${i === 0 ? 'sm:col-span-2 lg:row-span-2' : ''}`}>
+              <MediaCard m={m} big={i === 0} onOpen={onOpen} />
+            </div>
+          ))}
+        </div>
+      </Wrap>
+    </section>
+  );
+}
+
+export function MediaModal({ m, onClose }: { m: Media | null; onClose: () => void }) {
+  const { t, lang } = useI18n();
+  useModal(!!m, onClose);
+  if (!m) return null;
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/85 p-4" role="dialog" aria-modal="true" aria-label={m.title[lang]} onClick={onClose}>
+      <div className="fade-in w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-3 flex items-start justify-between gap-4">
           <div>
-            <p className="label text-gold">
-              {t.nav[video.section]} · <span dir="ltr">{video.duration}</span>
+            <p className="kicker text-emerald-300">
+              {t.media[m.type]} · <span dir="ltr">{m.type === 'photo' ? `${m.duration} ${t.media.photos}` : m.duration}</span>
             </p>
-            <h2 className="mt-1 text-xl font-bold text-white sm:text-2xl">{video.title[lang]}</h2>
+            <h2 className="font-display mt-1 text-xl font-semibold text-white sm:text-2xl">{m.title[lang]}</h2>
           </div>
-          <button autoFocus type="button" onClick={onClose} className="shrink-0 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-gold hover:text-navy">
+          <button autoFocus type="button" onClick={onClose} className="shrink-0 border border-white/30 px-4 py-2 text-sm font-semibold text-white hover:bg-white hover:text-navy">
             {t.ui.close}
           </button>
         </div>
-        <div className="overflow-hidden rounded-lg bg-black shadow-2xl">
-          {video.youtubeId ? (
-            <iframe
-              className="aspect-video w-full"
-              src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}?autoplay=1&hl=${lang}`}
-              title={video.title[lang]}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          ) : (
-            <Cover art={video.art} section={video.section} className="aspect-video">
-              <div className="absolute inset-0 grid place-items-center p-6 text-center">
-                <div className="max-w-sm rounded-lg bg-navy/85 p-6 backdrop-blur">
-                  <Logo size="sm" reversed />
-                  <p className="mt-4 text-sm text-paper/85">{t.ui.videoSoon}</p>
-                </div>
+        {m.youtubeId ? (
+          <iframe
+            className="aspect-video w-full bg-black"
+            src={`https://www.youtube-nocookie.com/embed/${m.youtubeId}?autoplay=1&hl=${lang}`}
+            title={m.title[lang]}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          <Cover art={m.art} region={m.region} className="aspect-video">
+            <div className="absolute inset-0 grid place-items-center bg-navy/50 p-6 text-center">
+              <div className="max-w-sm">
+                <Logo size="sm" reversed />
+                <p className="mt-4 text-sm text-white/85">{t.demo.notice}</p>
               </div>
-            </Cover>
-          )}
-        </div>
+            </div>
+          </Cover>
+        )}
       </div>
     </div>
   );
 }
 
-/* ── Article ── */
-function ShareBar({ title }: { title: string }) {
-  const { t } = useI18n();
-  const [copied, setCopied] = useState(false);
-  const url = typeof window !== 'undefined' ? window.location.href : '';
-  const enc = encodeURIComponent;
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* clipboard blocked */
-    }
-  };
-  const btn = 'grid h-9 w-9 place-items-center rounded-full border border-line text-heading transition hover:border-gold hover:bg-gold hover:text-navy';
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="label me-1 text-muted">{t.ui.share}</span>
-      <a className={btn} href={`https://x.com/intent/post?text=${enc(title)}&url=${enc(url)}`} target="_blank" rel="noopener noreferrer" aria-label="X">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.36 5.77L17.75 3Zm-1.08 16.17h1.7L7.4 4.74H5.58l11.09 14.43Z" />
-        </svg>
-      </a>
-      <a className={btn} href={`https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-        <Facebook size={15} />
-      </a>
-      <a className={btn} href={`https://wa.me/?text=${enc(`${title} ${url}`)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z" />
-        </svg>
-      </a>
-      <a className={btn} href={`https://t.me/share/url?url=${enc(url)}&text=${enc(title)}`} target="_blank" rel="noopener noreferrer" aria-label="Telegram">
-        <Send size={14} />
-      </a>
-      <button type="button" className={btn} onClick={copy} aria-label={t.ui.copyLink} title={t.ui.copyLink}>
-        {copied ? <Check size={15} className="text-verified" /> : <Link2 size={15} />}
-      </button>
-      <span role="status" className={`text-xs font-medium text-verified transition-opacity ${copied ? 'opacity-100' : 'opacity-0'}`}>
-        {t.ui.copied}
-      </span>
-    </div>
-  );
-}
-
-const SIZES = ['text-base', 'text-[17px]', 'text-lg', 'text-xl'];
-
-export function ArticlePage({ a }: { a: Article }) {
+/* ── Author ── */
+export function AuthorPage({ id }: { id: AuthorId }) {
   const { t, lang } = useI18n();
-  const c = a.i18n[lang];
-  const [progress, setProgress] = useState(0);
-  const [size, setSize] = useState(() => {
-    try {
-      const v = Number(localStorage.getItem('afrivue-textsize'));
-      return Number.isInteger(v) && v >= 0 && v < SIZES.length ? v : 1;
-    } catch {
-      return 1;
-    }
-  });
-  useEffect(() => {
-    try {
-      localStorage.setItem('afrivue-textsize', String(size));
-    } catch {
-      /* ignore */
-    }
-  }, [size]);
-  useEffect(() => {
-    const onScroll = () => {
-      const el = document.getElementById('article-body');
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      const total = r.height - window.innerHeight * 0.6;
-      setProgress(Math.min(1, Math.max(0, (-r.top + window.innerHeight * 0.3) / Math.max(total, 1))));
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [a.slug]);
-
-  const related = useMemo(() => {
-    const same = ARTICLES.filter((x) => x.slug !== a.slug && x.section === a.section);
-    const other = ARTICLES.filter((x) => x.slug !== a.slug && x.section !== a.section).sort(byDate);
-    return [...same, ...other].slice(0, 3);
-  }, [a.slug, a.section]);
-
+  const au = AUTHORS[id];
+  const items = useMemo(() => sortedArticles().filter((a) => a.author === id), [id]);
   return (
     <>
-      <div className="fixed inset-x-0 top-0 z-[45] h-1 bg-transparent" aria-hidden>
-        <div className="h-full bg-gold transition-[width] duration-150 ltr:origin-left" style={{ width: `${progress * 100}%`, marginInlineStart: 0 }} />
-      </div>
-
-      <article className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 sm:pt-12">
-        <nav aria-label="Breadcrumb" className="label mb-6 flex items-center gap-2 text-muted">
-          <Link to="/" className="hover:text-heading">
-            {t.nav.home}
-          </Link>
-          <span aria-hidden>/</span>
-          <Link to={`/${a.section}`} className="hover:text-heading">
-            {t.nav[a.section]}
-          </Link>
-          {a.type === 'analysis' && (
-            <>
-              <span aria-hidden>/</span>
-              <Link to="/analysis" className="hover:text-heading">
-                {t.nav.analysis}
-              </Link>
-            </>
-          )}
-        </nav>
-
-        <header className="mx-auto max-w-3xl">
-          <div className="mb-4 flex items-center gap-2">
-            <SectionTag section={a.section} />
-            {a.verified && <VerifiedBadge />}
+      <section className="border-b border-line">
+        <Wrap className="flex flex-col gap-6 py-12 sm:flex-row sm:items-center">
+          <Avatar author={au} size="xl" />
+          <div>
+            <p className="kicker text-accent">{au.desk ? t.author.desk : t.author.contributor}</p>
+            <h1 className="font-display mt-1 text-4xl font-bold text-heading">{au.name[lang]}</h1>
+            <p className="mt-1 text-muted">{au.role[lang]}</p>
+            <p className="mt-3 max-w-2xl leading-relaxed text-fg">{au.bio[lang]}</p>
           </div>
-          <h1 className="text-[2rem] font-bold leading-[1.15] tracking-tight text-heading sm:text-[2.6rem]">{c.title}</h1>
-          <p className="mt-4 text-lg leading-relaxed text-muted sm:text-xl">{c.excerpt}</p>
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-line py-4">
-            <div className="flex items-center gap-3">
-              <span className="grid h-11 w-11 place-items-center rounded-full bg-navy text-sm font-bold text-gold" aria-hidden dir="ltr">
-                AV
-              </span>
-              <div>
-                <p className="text-sm font-semibold text-heading">
-                  {t.ui.by} {t.desks[a.desk].t}
-                </p>
-                <p className="text-xs text-muted">
-                  <time dateTime={a.date}>{formatDate(a.date, lang, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</time> · {a.readMin} {t.ui.minRead}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-1" role="group" aria-label={t.ui.textSize}>
-              <span className="label me-2 text-muted">{t.ui.textSize}</span>
-              <button type="button" onClick={() => setSize((s) => Math.max(0, s - 1))} disabled={size === 0} className="grid h-8 w-8 place-items-center rounded-full border border-line text-heading hover:border-gold disabled:opacity-40" aria-label="A-">
-                <Minus size={14} />
-              </button>
-              <button type="button" onClick={() => setSize((s) => Math.min(SIZES.length - 1, s + 1))} disabled={size === SIZES.length - 1} className="grid h-8 w-8 place-items-center rounded-full border border-line text-heading hover:border-gold disabled:opacity-40" aria-label="A+">
-                <Plus size={14} />
-              </button>
-            </div>
-          </div>
-        </header>
-
-        <Cover art={a.art} section={a.section} className="mx-auto mt-8 aspect-[16/8] max-w-5xl rounded-lg" />
-
-        <div id="article-body" className="mx-auto mt-10 max-w-3xl">
-          <div className={`prose-article leading-[1.8] text-fg ${SIZES[size]}`}>
-            {c.body.map((p, i) => (
-              <p key={i}>{p}</p>
+        </Wrap>
+      </section>
+      <Wrap className="py-12">
+        <h2 className="kicker mb-6 text-heading">
+          {t.author.articles} ({items.length})
+        </h2>
+        {items.length ? (
+          <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((a) => (
+              <StoryCard key={a.slug} a={a} />
             ))}
           </div>
-          <div className="mt-10 border-t border-line pt-6">
-            <ShareBar title={c.title} />
-          </div>
-          <Link to={`/${a.section}`} className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-heading">
-            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1 rtl:rotate-180 rtl:group-hover:translate-x-1" />
-            {t.sections[a.section].title}
-          </Link>
-        </div>
-      </article>
+        ) : (
+          <Empty />
+        )}
+      </Wrap>
+    </>
+  );
+}
 
-      <section aria-labelledby="related-title" className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <SectionHeading id="related-title">{t.ui.related}</SectionHeading>
-        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {related.map((r) => (
-            <ArticleCard key={r.slug} a={r} />
+/* ── Policy pages ── */
+export function PolicyPage({ k }: { k: 'corrections' | 'privacy' | 'terms' }) {
+  const { t } = useI18n();
+  const p = t.policies[k];
+  return (
+    <>
+      <PageHero kicker="AfriVue Info" title={p.title} />
+      <Wrap className="py-12">
+        <div className="font-reading max-w-[700px] space-y-5 text-[18px] leading-relaxed text-fg">
+          {p.body.map((x) => (
+            <p key={x}>{x}</p>
           ))}
         </div>
-      </section>
-      <Newsletter />
+      </Wrap>
     </>
   );
 }
 
 /* ── About ── */
 export function AboutPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
   const [sent, setSent] = useState(false);
+  const team = Object.values(AUTHORS);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const err: typeof errors = {};
     if (!form.name.trim()) err.name = t.about.required;
     if (!form.email.trim()) err.email = t.about.required;
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) err.email = t.about.invalidEmail;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) err.email = t.newsletter.invalid;
     if (!form.message.trim()) err.message = t.about.required;
     setErrors(err);
-    if (Object.keys(err).length) {
-      document.getElementById(`f-${Object.keys(err)[0]}`)?.focus();
-      return;
-    }
-    // TODO: connect to your backend / form service (Formspree, Netlify Forms, etc.)
+    if (Object.keys(err).length) return document.getElementById(`f-${Object.keys(err)[0]}`)?.focus();
+    // TODO: connect to a backend or form service (Formspree, Netlify Forms…)
     setSent(true);
   };
 
-  const field = (k: keyof typeof form, label: string, type = 'text', textarea = false) => (
-    <div className={textarea ? 'sm:col-span-2' : ''}>
-      <label htmlFor={`f-${k}`} className="mb-1.5 block text-sm font-medium text-heading">
-        {label}
-        {k !== 'subject' && <span className="text-terracotta"> *</span>}
-      </label>
-      {textarea ? (
-        <textarea
-          id={`f-${k}`}
-          rows={5}
-          value={form[k]}
-          onChange={(e) => setForm({ ...form, [k]: e.target.value })}
-          aria-invalid={!!errors[k]}
-          aria-describedby={errors[k] ? `e-${k}` : undefined}
-          className={`w-full rounded-lg border bg-bg px-4 py-3 text-fg outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/30 ${errors[k] ? 'border-terracotta' : 'border-line'}`}
-        />
-      ) : (
-        <input
-          id={`f-${k}`}
-          type={type}
-          value={form[k]}
-          autoComplete={k === 'email' ? 'email' : k === 'name' ? 'name' : undefined}
-          onChange={(e) => setForm({ ...form, [k]: e.target.value })}
-          aria-invalid={!!errors[k]}
-          aria-describedby={errors[k] ? `e-${k}` : undefined}
-          className={`h-12 w-full rounded-lg border bg-bg px-4 text-fg outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/30 ${errors[k] ? 'border-terracotta' : 'border-line'}`}
-        />
-      )}
-      {errors[k] && (
-        <p id={`e-${k}`} className="mt-1 text-xs font-medium text-terracotta" role="alert">
-          {errors[k]}
-        </p>
-      )}
-    </div>
-  );
+  const field = (k: keyof typeof form, label: string, type = 'text', area = false) => {
+    const cls = `w-full border bg-bg px-4 text-fg outline-none transition-colors focus:border-navy dark:focus:border-emerald ${errors[k] ? 'border-terracotta' : 'border-line'}`;
+    const common = {
+      id: `f-${k}`,
+      value: form[k],
+      'aria-invalid': !!errors[k],
+      'aria-describedby': errors[k] ? `e-${k}` : undefined,
+    };
+    return (
+      <div className={area || k === 'subject' ? 'sm:col-span-2' : ''}>
+        <label htmlFor={`f-${k}`} className="mb-1.5 block text-sm font-medium text-heading">
+          {label}
+          {k !== 'subject' && <span className="text-terracotta"> *</span>}
+        </label>
+        {area ? (
+          <textarea {...common} rows={5} onChange={(e) => setForm({ ...form, [k]: e.target.value })} className={`${cls} py-3`} />
+        ) : (
+          <input {...common} type={type} autoComplete={k === 'email' ? 'email' : k === 'name' ? 'name' : undefined} onChange={(e) => setForm({ ...form, [k]: e.target.value })} className={`${cls} h-12`} />
+        )}
+        {errors[k] && (
+          <p id={`e-${k}`} className="mt-1 text-xs font-medium text-terracotta" role="alert">
+            {errors[k]}
+          </p>
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
-      <section className="relative overflow-hidden bg-navy text-paper">
-        <div className="pointer-events-none absolute -end-32 -top-32 h-96 w-96 rounded-full border-[56px] border-gold/10" aria-hidden />
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-12 lg:items-center">
-          <div className="lg:col-span-7">
-            <p className="label mb-4 text-gold">{t.about.kicker}</p>
-            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">{t.about.title}</h1>
-            <span className="mt-6 block h-1 w-16 bg-gold" aria-hidden />
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-paper/85">{t.about.mission}</p>
+      <section className="bg-navy">
+        <Wrap className="grid gap-10 py-16 sm:py-20 lg:grid-cols-12">
+          <div className="lg:col-span-8">
+            <p className="kicker text-emerald-300">{t.about.kicker}</p>
+            <h1 className="font-display mt-3 text-[2.6rem] font-bold leading-[1.06] text-white sm:text-[3.4rem]">{t.about.title}</h1>
+            <p className="font-display mt-6 max-w-2xl text-[1.3rem] leading-relaxed text-white/80">{t.about.mission}</p>
           </div>
-          <div className="lg:col-span-5">
-            <dl className="grid grid-cols-3 gap-3">
-              {t.about.stats.map((s) => (
-                <div key={s.l} className="rounded-lg border border-white/10 bg-white/5 p-4 text-center">
-                  <dt className="sr-only">{s.l}</dt>
-                  <dd>
-                    <span className="block text-3xl font-bold text-gold" dir="ltr">
-                      {s.n}
-                    </span>
-                    <span className="mt-1 block text-xs text-paper/75">{s.l}</span>
-                  </dd>
-                </div>
-              ))}
-            </dl>
+          <div className="flex items-end lg:col-span-4 lg:justify-end">
+            <p className="font-display text-2xl italic text-emerald-300">{t.meta.tagline}</p>
           </div>
-        </div>
+        </Wrap>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6" aria-labelledby="values-title">
-        <SectionHeading id="values-title">{t.about.valuesTitle}</SectionHeading>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <Wrap className="py-16">
+        <h2 className="font-display border-t-[3px] border-navy pt-4 text-[2rem] font-bold text-heading dark:border-emerald">{t.about.valuesTitle}</h2>
+        <div className="mt-8 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {t.about.values.map((v, i) => (
-            <div key={v.t} className="rounded-lg border border-line bg-surface p-6 transition hover:-translate-y-1 hover:border-gold hover:shadow-lg">
-              <span className="text-sm font-bold text-gold" dir="ltr">
+            <div key={v.t}>
+              <span className="text-sm font-semibold tabular-nums text-accent" dir="ltr">
                 0{i + 1}
               </span>
-              <h3 className="mt-3 text-lg font-bold text-heading">{v.t}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{v.d}</p>
+              <h3 className="font-display mt-2 text-xl font-bold text-heading">{v.t}</h3>
+              <p className="mt-2 leading-relaxed text-muted">{v.d}</p>
             </div>
           ))}
         </div>
-      </section>
+      </Wrap>
 
-      <section className="border-y border-line bg-surface py-14" aria-labelledby="team-title">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <SectionHeading id="team-title">{t.about.teamTitle}</SectionHeading>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-            {(['chad', 'sahel', 'africa', 'analysis', 'video'] as const).map((d) => (
-              <div key={d} className="rounded-lg border border-line bg-bg p-6">
-                <span className="grid h-12 w-12 place-items-center rounded-full bg-navy text-gold dark:bg-gold dark:text-navy">
-                  <MapPin size={20} aria-hidden />
-                </span>
-                <h3 className="mt-4 font-bold text-heading">{t.desks[d].t}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted">{t.desks[d].d}</p>
-              </div>
+      <section id="team" className="scroll-mt-20 border-y border-line bg-surface">
+        <Wrap className="py-16">
+          <h2 className="font-display border-t-[3px] border-navy pt-4 text-[2rem] font-bold text-heading dark:border-emerald">{t.about.teamTitle}</h2>
+          <p className="mt-2 text-sm text-muted">{t.about.teamNote}</p>
+          <ul className="mt-8 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+            {team.map((au) => (
+              <li key={au.id}>
+                <Link to={`/author/${au.id}`} className="group flex items-start gap-4">
+                  <Avatar author={au} size="lg" />
+                  <span>
+                    <span className="font-display block text-lg font-bold text-heading group-hover:underline">{au.name[lang]}</span>
+                    <span className="block text-sm text-accent">{au.role[lang]}</span>
+                  </span>
+                </Link>
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
+        </Wrap>
       </section>
 
-      <section id="contact" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-14 sm:px-6" aria-labelledby="contact-title">
-        <div className="grid gap-10 lg:grid-cols-12">
+      <section id="contact" className="scroll-mt-20">
+        <Wrap className="grid gap-12 py-16 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <SectionHeading id="contact-title">{t.about.contactTitle}</SectionHeading>
-            <p className="text-muted">{t.about.contactText}</p>
-            <a href={`mailto:${SITE.email}`} className="mt-6 inline-flex items-center gap-3 rounded-lg border border-line bg-surface px-4 py-3 font-medium text-heading hover:border-gold">
-              <Mail size={18} className="text-gold" aria-hidden />
+            <h2 className="font-display border-t-[3px] border-navy pt-4 text-[2rem] font-bold text-heading dark:border-emerald">{t.about.contactTitle}</h2>
+            <p className="mt-3 text-muted">{t.about.contactText}</p>
+            <a href={`mailto:${SITE.email}`} className="mt-6 inline-flex items-center gap-3 font-medium text-heading hover:text-accent">
+              <Mail size={18} className="text-emerald" aria-hidden />
               <span dir="ltr">{SITE.email}</span>
             </a>
-            <div className="mt-6 text-heading">
-              <p className="label mb-2 text-muted">{t.footer.follow}</p>
-              <SocialLinks className="-ms-1.5" />
+            <div className="mt-8">
+              <p className="kicker mb-2 text-muted">{t.ui.followUs}</p>
+              <SocialLinks className="-ms-2 text-heading" itemClass="h-9 w-9 opacity-75 hover:opacity-100" size={16} />
             </div>
           </div>
           <div className="lg:col-span-8">
             {sent ? (
-              <div className="fade-up flex items-center gap-3 rounded-lg bg-verified px-6 py-8 text-lg font-medium text-white" role="status">
-                <Check size={24} aria-hidden /> {t.about.sent}
-              </div>
+              <p className="fade-in flex items-center gap-3 border-s-[3px] border-emerald bg-surface px-6 py-8 text-lg font-medium text-heading" role="status">
+                <Check size={22} className="text-emerald" aria-hidden /> {t.about.sent}
+              </p>
             ) : (
-              <form onSubmit={submit} noValidate className="grid gap-5 rounded-xl border border-line bg-surface p-6 sm:grid-cols-2 sm:p-8">
+              <form onSubmit={submit} noValidate className="grid gap-5 sm:grid-cols-2">
                 {field('name', t.about.name)}
                 {field('email', t.about.email, 'email')}
-                <div className="sm:col-span-2">{field('subject', t.about.subject)}</div>
+                {field('subject', t.about.subject)}
                 {field('message', t.about.message, 'text', true)}
                 <div className="sm:col-span-2">
-                  <button type="submit" className="inline-flex h-12 items-center gap-2 rounded-full bg-gold px-8 font-semibold text-navy transition hover:bg-navy hover:text-white dark:hover:bg-white dark:hover:text-navy">
+                  <button type="submit" className="inline-flex h-12 items-center gap-2 bg-navy px-8 font-semibold text-white transition-colors hover:bg-emerald-700 dark:bg-emerald dark:text-navy">
                     <Send size={16} className="rtl:-scale-x-100" aria-hidden /> {t.about.send}
                   </button>
                 </div>
               </form>
             )}
           </div>
-        </div>
+        </Wrap>
       </section>
     </>
   );
@@ -556,15 +427,15 @@ export function AboutPage() {
 export function NotFound() {
   const { t } = useI18n();
   return (
-    <section className="mx-auto flex max-w-2xl flex-col items-center px-4 py-24 text-center">
-      <p className="text-8xl font-bold text-gold" dir="ltr">
+    <Wrap className="flex flex-col items-center py-24 text-center">
+      <p className="font-display text-8xl font-bold text-emerald" dir="ltr">
         404
       </p>
-      <h1 className="mt-4 text-3xl font-bold text-heading">{t.notFound.title}</h1>
+      <h1 className="font-display mt-4 text-3xl font-bold text-heading">{t.notFound.title}</h1>
       <p className="mt-3 text-muted">{t.notFound.text}</p>
-      <Link to="/" className="mt-8 rounded-full bg-gold px-7 py-3 font-semibold text-navy hover:bg-navy hover:text-white">
+      <Link to="/" className="mt-8 bg-navy px-7 py-3 font-semibold text-white hover:bg-emerald-700">
         {t.ui.backHome}
       </Link>
-    </section>
+    </Wrap>
   );
 }

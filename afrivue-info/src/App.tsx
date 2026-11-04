@@ -1,10 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getArticle, type Video } from './data';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { AFRICA_REGIONS, AUTHORS, SITE, getArticle, type AuthorId, type Media, type Region, type Topic } from './data';
 import { I18nContext, LANG_META, STRINGS, detectLang, type I18nValue, type Lang } from './i18n';
 import { useRoute } from './router';
-import { BackToTop, Footer, Header, MobileMenu, SearchOverlay, Ticker, TopBar, type NavKey } from './components/layout';
+import { BackToTop, Footer, Masthead, MobileMenu, Newsletter, PrimaryNav, SearchOverlay, Ticker, UtilityBar, type NavKey } from './components/layout';
 import { Home } from './pages/Home';
-import { AboutPage, AnalysisPage, ArticlePage, NotFound, SectionPage, VideoModal, VideosPage } from './pages/Pages';
+import { ArticlePage } from './pages/Article';
+import { AboutPage, AfricaPage, AnalysisPage, AuthorPage, ChadPage, InDepthPage, MediaModal, NotFound, PolicyPage, TopicPage, VideoPage } from './pages/Pages';
+
+const TOPICS: Topic[] = ['politics', 'economy', 'society', 'development', 'culture', 'sports', 'technology'];
+/** Old URLs from the first version of the site keep working */
+const LEGACY: Record<string, string> = { sahel: 'africa/sahel', videos: 'video' };
+
+function setMeta(selector: string, attr: string, value: string) {
+  document.querySelector(selector)?.setAttribute(attr, value);
+}
 
 export default function App() {
   const route = useRoute();
@@ -12,12 +21,12 @@ export default function App() {
   const t = STRINGS[lang];
   const pathKey = route.path.join('/');
 
-  // Normalise URLs without a language prefix → #/{lang}/...
+  // Normalise URLs → #/{lang}/{path}
   useEffect(() => {
-    if (!route.lang) window.location.replace(`#/${lang}/${pathKey}${route.anchor ? `#${route.anchor}` : ''}`);
+    const legacy = LEGACY[pathKey];
+    if (!route.lang || legacy) window.location.replace(`#/${lang}/${legacy ?? pathKey}${route.anchor ? `#${route.anchor}` : ''}`);
   }, [route.lang, lang, pathKey, route.anchor]);
 
-  // <html lang/dir>, persisted preference
   useEffect(() => {
     const root = document.documentElement;
     root.lang = lang;
@@ -29,18 +38,18 @@ export default function App() {
     }
   }, [lang]);
 
+  // Switching language keeps the reader on the same page (every story exists in all four languages)
   const setLang = useCallback(
     (l: Lang) => {
       window.location.hash = `#/${l}/${pathKey}${route.anchor ? `#${route.anchor}` : ''}`;
     },
     [pathKey, route.anchor],
   );
-
   const i18n: I18nValue = useMemo(() => ({ lang, t, dir: LANG_META[lang].dir, setLang }), [lang, t, setLang]);
 
   /* Theme */
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
-  const toggleTheme = () => {
+  const toggleTheme = () =>
     setDark((d) => {
       const next = !d;
       document.documentElement.classList.toggle('dark', next);
@@ -51,21 +60,19 @@ export default function App() {
       }
       return next;
     });
-  };
 
   /* Overlays */
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [video, setVideo] = useState<Video | null>(null);
+  const [media, setMedia] = useState<Media | null>(null);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
-  const closeVideo = useCallback(() => setVideo(null), []);
+  const closeMedia = useCallback(() => setMedia(null), []);
 
-  // "/" opens search
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+      const el = e.target as HTMLElement;
+      if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(el?.tagName) && !el?.isContentEditable) {
         e.preventDefault();
         setSearchOpen(true);
       }
@@ -74,56 +81,96 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  // Scroll to top (or to #anchor) on page change
   useEffect(() => {
     setMenuOpen(false);
-    if (route.anchor) {
-      window.setTimeout(() => document.getElementById(route.anchor!)?.scrollIntoView({ behavior: 'smooth' }), 60);
-    } else {
-      window.scrollTo({ top: 0 });
-    }
+    setSearchOpen(false);
+    if (route.anchor) window.setTimeout(() => document.getElementById(route.anchor!)?.scrollIntoView({ behavior: 'smooth' }), 80);
+    else window.scrollTo({ top: 0 });
   }, [pathKey, route.anchor]);
 
   /* Resolve page */
   const [p0, p1] = route.path;
-  let page: React.ReactNode;
+  let page: ReactNode;
   let active: NavKey | null = null;
   let title = '';
   const article = p0 === 'article' && p1 ? getArticle(p1) : undefined;
 
   if (!p0) {
-    page = <Home onPlay={setVideo} />;
+    page = <Home onOpenMedia={setMedia} />;
     active = 'home';
-  } else if (p0 === 'chad' || p0 === 'sahel' || p0 === 'africa') {
-    page = <SectionPage key={p0} section={p0} />;
-    active = p0;
-    title = t.sections[p0].title;
+  } else if (p0 === 'chad') {
+    page = <ChadPage />;
+    active = 'chad';
+    title = t.nav.chad;
+  } else if (p0 === 'africa') {
+    const r = AFRICA_REGIONS.includes(p1 as Region) ? (p1 as Region) : undefined;
+    page = <AfricaPage key={r ?? 'all'} initial={r} />;
+    active = 'africa';
+    title = r ? t.regions[r] : t.nav.africa;
+  } else if (TOPICS.includes(p0 as Topic)) {
+    page = <TopicPage key={p0} topic={p0 as Topic} />;
+    active = p0 as Topic;
+    title = t.nav[p0 as Topic];
   } else if (p0 === 'analysis') {
     page = <AnalysisPage />;
     active = 'analysis';
-    title = t.analysisPage.title;
-  } else if (p0 === 'videos') {
-    page = <VideosPage onPlay={setVideo} />;
-    active = 'videos';
-    title = t.videosPage.title;
+    title = t.nav.analysis;
+  } else if (p0 === 'in-depth') {
+    page = <InDepthPage />;
+    active = 'indepth';
+    title = t.nav.indepth;
+  } else if (p0 === 'video') {
+    page = <VideoPage onOpen={setMedia} />;
+    active = 'video';
+    title = t.nav.video;
   } else if (p0 === 'about') {
     page = <AboutPage />;
     active = 'about';
     title = t.about.title;
+  } else if (p0 === 'author' && p1 && p1 in AUTHORS) {
+    page = <AuthorPage key={p1} id={p1 as AuthorId} />;
+    title = AUTHORS[p1 as AuthorId].name[lang];
+  } else if (p0 === 'page' && (p1 === 'corrections' || p1 === 'privacy' || p1 === 'terms')) {
+    page = <PolicyPage k={p1} />;
+    title = t.policies[p1].title;
   } else if (article) {
     page = <ArticlePage key={article.slug} a={article} />;
-    active = article.type === 'analysis' ? 'analysis' : article.section;
+    active = article.format === 'report' ? 'indepth' : article.format !== 'news' ? 'analysis' : article.region === 'chad' ? 'chad' : article.topic === 'development' ? 'society' : article.topic;
     title = article.i18n[lang].title;
   } else {
     page = <NotFound />;
     title = t.notFound.title;
   }
 
-  // Document title + meta description per page/language
+  /* SEO: title, description, Open Graph, structured data */
   useEffect(() => {
-    document.title = title ? `${title} | AfriVue Info` : `AfriVue Info — ${t.meta.tagline}`;
+    const full = title ? `${title} | AfriVue Info` : `AfriVue Info — ${t.meta.tagline}`;
     const desc = article ? article.i18n[lang].excerpt : t.meta.description;
-    document.querySelector('meta[name="description"]')?.setAttribute('content', desc);
+    document.title = full;
+    setMeta('meta[name="description"]', 'content', desc);
+    setMeta('meta[property="og:title"]', 'content', full);
+    setMeta('meta[property="og:description"]', 'content', desc);
+    setMeta('meta[property="og:type"]', 'content', article ? 'article' : 'website');
+    document.getElementById('ld-json')?.remove();
+    const ld = document.createElement('script');
+    ld.type = 'application/ld+json';
+    ld.id = 'ld-json';
+    ld.text = JSON.stringify(
+      article
+        ? {
+            '@context': 'https://schema.org',
+            '@type': article.format === 'news' ? 'NewsArticle' : 'AnalysisNewsArticle',
+            headline: article.i18n[lang].title,
+            description: article.i18n[lang].excerpt,
+            inLanguage: lang,
+            datePublished: article.date,
+            dateModified: article.updated ?? article.date,
+            author: { '@type': AUTHORS[article.author].desk ? 'Organization' : 'Person', name: AUTHORS[article.author].name[lang] },
+            publisher: { '@type': 'NewsMediaOrganization', name: 'AfriVue Info' },
+          }
+        : { '@context': 'https://schema.org', '@type': 'NewsMediaOrganization', name: 'AfriVue Info', slogan: t.meta.tagline, email: SITE.email },
+    );
+    document.head.appendChild(ld);
   }, [title, t, article, lang]);
 
   return (
@@ -134,21 +181,23 @@ export default function App() {
           e.preventDefault();
           document.getElementById('main')?.focus();
         }}
-        className="sr-only z-[60] rounded bg-gold px-4 py-2 font-semibold text-navy focus:not-sr-only focus:fixed focus:start-3 focus:top-3"
+        className="sr-only z-[60] bg-emerald px-4 py-2 font-semibold text-white focus:not-sr-only focus:fixed focus:start-3 focus:top-3"
       >
         {t.ui.skip}
       </a>
-      <TopBar dark={dark} onToggleTheme={toggleTheme} />
-      <Header active={active} onSearch={() => setSearchOpen(true)} onMenu={() => setMenuOpen(true)} />
+      <UtilityBar dark={dark} onToggleTheme={toggleTheme} />
+      <Masthead onSearch={() => setSearchOpen(true)} onMenu={() => setMenuOpen(true)} />
+      <PrimaryNav active={active} onSearch={() => setSearchOpen(true)} />
       <Ticker />
       <main id="main" tabIndex={-1} className="min-h-[60vh] outline-none">
         {page}
       </main>
+      <Newsletter />
       <Footer />
       <BackToTop />
       <MobileMenu open={menuOpen} onClose={closeMenu} active={active} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
-      <VideoModal video={video} onClose={closeVideo} />
+      <MediaModal m={media} onClose={closeMedia} />
     </I18nContext.Provider>
   );
 }
