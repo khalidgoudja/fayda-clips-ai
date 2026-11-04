@@ -4,19 +4,42 @@ import type { Art, Article, Section } from '../data';
 import { formatDate, useI18n } from '../i18n';
 import { Link } from '../router';
 
-/* ── Logo: pure typography, "Afri" navy + "Vue" gold (white "Afri" when reversed) ── */
-export function Logo({ size = 'md', reversed = false, tag = true }: { size?: 'sm' | 'md' | 'lg'; reversed?: boolean; tag?: boolean }) {
-  const word = { sm: 'text-2xl', md: 'text-[2rem] sm:text-[2.4rem]', lg: 'text-5xl' }[size];
-  const tagCls = { sm: 'text-[0.5rem] tracking-[0.5em]', md: 'text-[0.6rem] tracking-[0.6em]', lg: 'text-xs tracking-[0.6em]' }[size];
+/* ── Logo: interlocking "AV" mark (navy A + emerald V) + "AfriVue" wordmark + spaced "INFO" ── */
+const V_PATH = 'M58 2H84L104 50L124 2H150L112 90H96Z';
+
+export function LogoMark({ reversed = false, className = '' }: { reversed?: boolean; className?: string }) {
+  const id = `av${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   return (
-    <span dir="ltr" className="inline-flex flex-col items-center leading-none select-none" style={{ fontFamily: 'Poppins, sans-serif' }}>
-      <span className={`${word} font-bold tracking-tight`}>
-        <span className={reversed ? 'text-white' : 'text-navy dark:text-white'}>Afri</span>
-        <span className="text-gold">Vue</span>
+    <svg viewBox="-1 0 152 92" className={`${reversed ? 'text-white' : 'text-navy dark:text-white'} ${className}`} aria-hidden="true">
+      <defs>
+        <mask id={id} maskUnits="userSpaceOnUse" x="-10" y="-10" width="180" height="120">
+          <rect x="-10" y="-10" width="180" height="120" fill="#fff" />
+          <path d={V_PATH} fill="#000" stroke="#000" strokeWidth="8" strokeLinejoin="round" />
+        </mask>
+      </defs>
+      <g mask={`url(#${id})`} fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
+        <path d="M1 89L37 6Q39 2 43 2H64L27 89Z" />
+        <path d="M74 30C52 38 46 70 63 89H96Z" />
+      </g>
+      <path d={V_PATH} fill="#03A677" stroke="#03A677" strokeWidth="2" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function Logo({ size = 'md', reversed = false, tag = true }: { size?: 'sm' | 'md' | 'lg'; reversed?: boolean; tag?: boolean }) {
+  const s = {
+    sm: { mark: 'h-7', word: 'text-[1.4rem]', tag: 'text-[0.45rem]', gap: 'gap-1.5' },
+    md: { mark: 'h-11 sm:h-[3.4rem]', word: 'text-[1.9rem] sm:text-[2.35rem]', tag: 'text-[0.55rem] sm:text-[0.62rem]', gap: 'gap-2 sm:gap-2.5' },
+    lg: { mark: 'h-16', word: 'text-[2.8rem]', tag: 'text-[0.75rem]', gap: 'gap-3' },
+  }[size];
+  const color = reversed ? 'text-white' : 'text-navy dark:text-white';
+  return (
+    <span dir="ltr" className={`inline-flex items-center leading-none select-none ${s.gap}`} style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <LogoMark reversed={reversed} className={`${s.mark} w-auto shrink-0`} />
+      <span className={`inline-flex flex-col items-center ${color}`}>
+        <span className={`${s.word} font-bold tracking-[-0.02em]`}>AfriVue</span>
+        {tag && <span className={`${s.tag} mt-[0.2em] ps-[0.9em] font-semibold tracking-[0.9em]`}>INFO</span>}
       </span>
-      {tag && (
-        <span className={`${tagCls} mt-1 ps-[0.6em] font-medium ${reversed ? 'text-paper' : 'text-navy dark:text-paper'}`}>INFO</span>
-      )}
     </span>
   );
 }

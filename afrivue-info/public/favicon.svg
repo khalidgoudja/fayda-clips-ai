@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0B2545"/><g transform="translate(7 18.5) scale(0.333)"><defs><mask id="g" maskUnits="userSpaceOnUse" x="-10" y="-10" width="180" height="120"><rect x="-10" y="-10" width="180" height="120" fill="#fff"/><path d="M58 2H84L104 50L124 2H150L112 90H96Z" stroke="#000" stroke-width="8" stroke-linejoin="round"/></mask></defs>
+<g mask="url(#g)" fill="#ffffff" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"><path d="M1 89L37 6Q39 2 43 2H64L27 89Z"/><path d="M74 30C52 38 46 70 63 89H96Z"/></g>
+<path d="M58 2H84L104 50L124 2H150L112 90H96Z" fill="#03A677" stroke="#03A677" stroke-width="2" stroke-linejoin="round"/></g></svg>

@@ -28,7 +28,9 @@ UX features: language switcher in the top utility bar (choice is remembered, the
 
 ## Brand
 
-Colours, fonts and logo rules come from the brand guide: Deep Navy `#0B2545`, Sahel Gold `#C89B3C`, Terracotta `#B5502D`, Paper `#F7F4EF`, Ink `#1C1C1C`, Verified Green `#2F6D4F`. Fonts are Poppins, with Cairo for Arabic. The wordmark is pure typography: "Afri" is navy (white on dark backgrounds) and "Vue" is gold. These tokens live in `src/index.css`.
+**Logo:** an interlocking **AV** mark (navy A, emerald V `#03A677`) next to the "AfriVue" wordmark, with "INFO" letter-spaced underneath. It is built as a vector (`LogoMark` / `Logo` in `src/components/ui.tsx`). On dark backgrounds the navy parts turn white. Logo files are in `public/`: `logo-primary.svg`, `logo-reversed.svg`, `logo-mark.svg` and `favicon.svg`.
+
+**Palette:** Deep Navy `#0B2545`, Sahel Gold `#C89B3C`, Terracotta `#B5502D`, Paper `#F7F4EF`, Ink `#1C1C1C`, Verified Green `#2F6D4F`. **Fonts:** Poppins, with Cairo for Arabic. These tokens are in `src/index.css`.
 
 ## Editing content
 
