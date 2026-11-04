@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Brand tokens (AfriVue Info Brand Identity Guide v1.0) ── */
+@theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: "Cairo", "Tajawal", ui-sans-serif, system-ui, sans-serif;
+
+  --color-navy: #0b2545;      /* Deep Navy – primary */
+  --color-navy-700: #13355f;
+  --color-gold: #c89b3c;      /* Sahel Gold – accent / CTAs */
+  --color-gold-300: #e2c27f;
+  --color-terracotta: #b5502d;/* Terracotta – tags, live */
+  --color-paper: #f7f4ef;     /* Paper – page background */
+  --color-ink: #1c1c1c;       /* Ink – body text */
+  --color-verified: #2f6d4f;  /* Verified Green – fact-check */
+}
+
+/* Semantic tokens that switch with the theme */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-heading: var(--heading);
+  --color-accent: var(--accent);
+}
+
+:root {
+  --bg: #f7f4ef;
+  --surface: #ffffff;
+  --fg: #1c1c1c;
+  --muted: #5a6270;
+  --line: #e3dccf;
+  --heading: #0b2545;
+  --accent: #8a6820; /* gold darkened for readable text on paper */
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #061528;
+  --surface: #0c2342;
+  --fg: #e8e3d9;
+  --muted: #a1abb9;
+  --line: #1d3a60;
+  --heading: #f7f4ef;
+  --accent: #dcb465;
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Arabic edition: Cairo/Tajawal instead of Poppins (no Arabic glyphs) */
+html[lang="ar"] body {
+  font-family: var(--font-arabic);
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-navy);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Captions / labels — Poppins Medium, letter-spaced */
+.label {
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+/* Letter-spacing breaks Arabic letter joining */
+html[lang="ar"] .label {
+  letter-spacing: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Headline links: animated underline */
+.headline-link {
+  background-image: linear-gradient(var(--color-gold), var(--color-gold));
+  background-size: 0% 2px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size 0.3s ease;
+}
+[dir="rtl"] .headline-link {
+  background-position: 100% 100%;
+}
+.group:hover .headline-link,
+.headline-link:hover {
+  background-size: 100% 2px;
+}
+
+/* Article body typography */
+.prose-article p {
+  margin-bottom: 1.4em;
+}
+.prose-article > p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.6em;
+  line-height: 0.9;
+  font-weight: 700;
+  color: var(--color-gold);
+  margin: 0.08em 0.12em 0 0;
+}
+[dir="rtl"] .prose-article > p:first-of-type::first-letter {
+  float: none;
+  font-size: inherit;
+  margin: 0;
+  color: inherit;
+  font-weight: inherit;
+}
+
+/* Breaking-news ticker */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-rtl {
+  from { transform: translateX(0); }
+  to { transform: translateX(50%); }
+}
+.ticker-track {
+  animation: marquee 60s linear infinite;
+}
+[dir="rtl"] .ticker-track {
+  animation-name: marquee-rtl;
+}
+.ticker:hover .ticker-track,
+.ticker:focus-within .ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.live-dot {
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.fade-up {
+  animation: fade-up 0.45s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .ticker-track { animation: none !important; }
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }

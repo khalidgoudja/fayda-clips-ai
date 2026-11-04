@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AfriVue Info — Chad &amp; Africa news and analysis</title>
+    <meta name="description" content="Independent news and analysis on Chad, the Sahel and Africa — in Arabic, French, English and Turkish." />
+    <meta name="theme-color" content="#0B2545" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <meta property="og:site_name" content="AfriVue Info" />
+    <meta property="og:title" content="AfriVue Info — Chad & Africa news and analysis" />
+    <meta property="og:description" content="Independent news and analysis on Chad, the Sahel and Africa." />
+    <meta property="og:image" content="./og-image.png" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script>
+      // Apply saved/system theme before paint to avoid a flash
+      try {
+        var t = localStorage.getItem('afrivue-theme');
+        if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
