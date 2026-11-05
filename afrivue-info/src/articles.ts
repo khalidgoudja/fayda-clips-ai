@@ -8,6 +8,7 @@ export const ARTICLES: Article[] = [
   /* ───────────── CHAD ───────────── */
   {
     slug: 'ndjamena-trade-corridor',
+    image: { src: './photos/ndjamena-trade-corridor.jpg', ai: true },
     region: 'chad',
     topic: 'economy',
     format: 'news',
@@ -64,6 +65,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'lake-chad-farmers',
+    image: { src: './photos/lake-chad-farmers.jpg', ai: true },
     region: 'chad',
     topic: 'development',
     format: 'news',
@@ -113,6 +115,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'chad-gum-arabic-explainer',
+    image: { src: './photos/chad-gum-arabic-explainer.jpg', ai: true },
     region: 'chad',
     topic: 'economy',
     format: 'explainer',
@@ -202,6 +205,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'ndjamena-tech-hub',
+    image: { src: './photos/ndjamena-tech-hub.jpg', ai: true },
     region: 'chad',
     topic: 'technology',
     format: 'news',
@@ -251,6 +255,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'chad-decentralisation-background',
+    image: { src: './photos/chad-decentralisation-background.jpg', ai: true },
     region: 'chad',
     topic: 'politics',
     format: 'background',
@@ -332,6 +337,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'chad-youth-football-academies',
+    image: { src: './photos/chad-youth-football-academies.jpg', ai: true },
     region: 'chad',
     topic: 'sports',
     format: 'news',
@@ -377,6 +383,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'chad-musicians-sahel-sound',
+    image: { src: './photos/chad-musicians-sahel-sound.jpg', ai: true },
     region: 'chad',
     topic: 'culture',
     format: 'news',
@@ -424,6 +431,7 @@ export const ARTICLES: Article[] = [
   /* ───────────── SAHEL ───────────── */
   {
     slug: 'sahel-youth-initiative',
+    image: { src: './photos/sahel-youth-initiative.jpg', ai: true },
     region: 'sahel',
     topic: 'society',
     format: 'news',
@@ -474,6 +482,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'sahel-regional-integration',
+    image: { src: './photos/sahel-regional-integration.jpg', ai: true },
     region: 'sahel',
     topic: 'politics',
     format: 'analysis',
@@ -572,6 +581,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'sahel-solar-clinics',
+    image: { src: './photos/sahel-solar-clinics.jpg', ai: true },
     region: 'sahel',
     topic: 'development',
     format: 'news',
@@ -621,6 +631,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'sahel-regional-bodies-background',
+    image: { src: './photos/sahel-regional-bodies-background.jpg', ai: true },
     region: 'sahel',
     topic: 'politics',
     format: 'background',
@@ -688,6 +699,7 @@ export const ARTICLES: Article[] = [
   /* ───────────── AFRICA ───────────── */
   {
     slug: 'africa-digital-payments',
+    image: { src: './photos/africa-digital-payments.jpg', ai: true },
     region: 'west',
     topic: 'technology',
     format: 'news',
@@ -737,6 +749,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'west-africa-football-leagues',
+    image: { src: './photos/west-africa-football-leagues.jpg', ai: true },
     region: 'west',
     topic: 'sports',
     format: 'news',
@@ -782,6 +795,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'north-africa-solar-corridors',
+    image: { src: './photos/north-africa-solar-corridors.jpg', ai: true },
     region: 'north',
     topic: 'economy',
     format: 'news',
@@ -827,6 +841,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'east-africa-logistics-race',
+    image: { src: './photos/east-africa-logistics-race.jpg', ai: true },
     region: 'east',
     topic: 'economy',
     format: 'news',
@@ -872,6 +887,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'central-africa-forest-communities',
+    image: { src: './photos/central-africa-forest-communities.jpg', ai: true },
     region: 'central',
     topic: 'society',
     format: 'news',
@@ -917,6 +933,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'southern-africa-creative-industries',
+    image: { src: './photos/southern-africa-creative-industries.jpg', ai: true },
     region: 'southern',
     topic: 'culture',
     format: 'news',
@@ -962,6 +979,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'bilingual-universities',
+    image: { src: './photos/bilingual-universities.jpg', ai: true },
     region: 'continental',
     topic: 'society',
     format: 'news',
@@ -1011,6 +1029,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'turkey-africa-trade',
+    image: { src: './photos/turkey-africa-trade.jpg', ai: true },
     region: 'continental',
     topic: 'economy',
     format: 'analysis',
@@ -1084,6 +1103,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'opinion-africa-global-voice',
+    image: { src: './photos/opinion-africa-global-voice.jpg', ai: true },
     region: 'continental',
     topic: 'politics',
     format: 'opinion',
@@ -1155,6 +1175,7 @@ export const ARTICLES: Article[] = [
   /* ───────────── SPECIAL REPORTS ───────────── */
   {
     slug: 'special-report-lake-chad-livelihoods',
+    image: { src: './photos/special-report-lake-chad-livelihoods.jpg', ai: true },
     region: 'chad',
     topic: 'development',
     format: 'report',
@@ -1245,6 +1266,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'special-report-sahel-young-generation',
+    image: { src: './photos/special-report-sahel-young-generation.jpg', ai: true },
     region: 'sahel',
     topic: 'society',
     format: 'report',

@@ -277,7 +277,7 @@ export function ArticlePage({ a }: { a: Article }) {
           <figcaption className="mt-2 flex flex-wrap justify-between gap-x-4 text-[13px] text-muted">
             <span>{`${L.primary(a)} — ${t.nav[a.topic]}`}</span>
             <span>
-              {t.article.credit}: {a.image ? a.image.credit : t.article.illustration}
+              {a.image?.ai ? t.article.aiImage : `${t.article.credit}: ${a.image?.credit ?? t.article.illustration}`}
             </span>
           </figcaption>
         </figure>

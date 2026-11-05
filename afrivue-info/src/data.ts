@@ -45,7 +45,8 @@ export interface Article {
   readMin: number;
   art: Art;
   /** Optional real photo; when absent a brand illustration is shown */
-  image?: { src: string; credit: string };
+  /** Photo for the story. `ai: true` marks an AI-generated illustrative image, labelled as such on the site. */
+  image?: { src: string; credit?: string; ai?: boolean };
   featured?: boolean;
   breaking?: boolean;
   views: number;

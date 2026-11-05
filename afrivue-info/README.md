@@ -76,7 +76,7 @@ Switching language keeps the reader on the same page. Old URLs `#/…/sahel` and
   - `{ chart }`
   
   An optional `why` list renders the **Why this matters** box. A table of contents appears automatically when a story has 3 or more headings.
-- **Photos:** add `image: { src, credit }` to a story to replace the generated illustration.
+- **Photos:** each story has `image: { src, credit?, ai? }`. The demo photos in `public/photos/` are **AI-generated illustrative images** (`ai: true`). They carry an "AI image" label on the picture and a caption saying they are not photos of real events. Replace them with real, credited photos before launch, using `image: { src: './photos/name.jpg', credit: 'Photographer / Agency' }`. Add a 640px copy named `name-640.jpg` for faster loading on phones.
 - **Contributors, multimedia, contact email, social URLs:** `src/data.ts` (`AUTHORS`, `MEDIA`, `SITE`).
 - **Interface text and policy pages:** `src/i18n.tsx`.
 - **Forms:** the newsletter and contact forms only validate in the browser. Connect them to a provider (see the `TODO`s).

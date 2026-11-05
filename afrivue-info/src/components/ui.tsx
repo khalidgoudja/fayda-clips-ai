@@ -55,13 +55,27 @@ const TONES: Record<string, { bg1: string; bg2: string; a: string; b: string }> 
 };
 const toneFor = (r: Region) => (r === 'chad' ? 'chad' : r === 'sahel' || r === 'north' ? 'sahel' : r === 'central' || r === 'east' ? 'green' : 'slate');
 
-export function Cover({ art, region, image, className = '', children }: { art: Art; region: Region; image?: { src: string }; className?: string; children?: ReactNode }) {
+export function Cover({ art, region, image, className = '', children }: { art: Art; region: Region; image?: { src: string; ai?: boolean }; className?: string; children?: ReactNode }) {
+  const { t } = useI18n();
   const id = useId().replace(/[^a-zA-Z0-9]/g, '');
   const c = TONES[toneFor(region)];
   return (
     <div className={`zoom relative overflow-hidden bg-navy ${className}`}>
       {image ? (
-        <img src={image.src} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+        <>
+          <img
+            src={image.src}
+            srcSet={image.src.endsWith('.jpg') ? `${image.src.replace(/\.jpg$/, '-640.jpg')} 640w, ${image.src} 1280w` : undefined}
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          {image.ai && (
+            <span className="pointer-events-none absolute bottom-2 end-2 rounded-sm bg-black/55 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-white/90 backdrop-blur-sm">{t.article.aiShort}</span>
+          )}
+        </>
       ) : (
         <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden="true">
           <defs>

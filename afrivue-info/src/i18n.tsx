@@ -103,6 +103,8 @@ const en = {
     video: 'Video reports, interviews, podcasts and photo stories.',
   },
   article: {
+    aiImage: 'Image generated with AI for illustration, not a photo of a real event',
+    aiShort: 'AI image',
     toc: 'In this article',
     why: 'Why this matters',
     related: 'Related stories',
@@ -298,6 +300,8 @@ const fr: Dict = {
     video: 'Reportages vidéo, entretiens, podcasts et récits photo.',
   },
   article: {
+    aiImage: 'Image générée par IA à titre d\'illustration, pas une photo d\'un événement réel',
+    aiShort: 'Image IA',
     toc: 'Dans cet article',
     why: 'Pourquoi c’est important',
     related: 'Articles liés',
@@ -491,6 +495,8 @@ const tr: Dict = {
     video: 'Video haberler, röportajlar, podcastler ve foto hikâyeler.',
   },
   article: {
+    aiImage: 'Yapay zekâ ile üretilmiş temsili görsel, gerçek bir olayın fotoğrafı değildir',
+    aiShort: 'YZ görseli',
     toc: 'Bu yazıda',
     why: 'Neden önemli?',
     related: 'İlgili haberler',
@@ -684,6 +690,8 @@ const ar: Dict = {
     video: 'تقارير مصوّرة ومقابلات وبودكاست وقصص مصوّرة.',
   },
   article: {
+    aiImage: 'صورة مولّدة بالذكاء الاصطناعي للتوضيح، وليست صورة لحدث حقيقي',
+    aiShort: 'صورة بالذكاء الاصطناعي',
     toc: 'في هذا المقال',
     why: 'لماذا يهمّ هذا؟',
     related: 'مواد ذات صلة',
