@@ -189,6 +189,23 @@ const en = {
     },
   } as Record<'corrections' | 'privacy' | 'terms', Policy>,
   notFound: { title: 'Page not found', text: 'The page you are looking for does not exist or has been moved.' },
+  tools: {
+    save: 'Save',
+    saved: 'Saved',
+    savedStories: 'Saved stories',
+    savedIntro: 'Stories you save are kept on this device, so you can come back to them later.',
+    savedEmpty: 'You have not saved any stories yet. Use the Save button on any article to keep it here.',
+    remove: 'Remove',
+    clearAll: 'Remove all',
+    listen: 'Listen',
+    pauseAudio: 'Pause',
+    resumeAudio: 'Resume',
+    stopAudio: 'Stop',
+    listening: 'Reading aloud',
+    print: 'Print',
+    moreShare: 'More sharing options',
+    browse: 'Browse the latest stories',
+  },
 };
 
 export type Dict = typeof en;
@@ -367,6 +384,23 @@ const fr: Dict = {
     },
   },
   notFound: { title: 'Page introuvable', text: "La page que vous recherchez n'existe pas ou a été déplacée." },
+  tools: {
+    save: 'Enregistrer',
+    saved: 'Enregistré',
+    savedStories: 'Articles enregistrés',
+    savedIntro: 'Les articles enregistrés sont conservés sur cet appareil pour y revenir plus tard.',
+    savedEmpty: "Vous n'avez encore enregistré aucun article. Utilisez le bouton Enregistrer sur un article pour le retrouver ici.",
+    remove: 'Retirer',
+    clearAll: 'Tout retirer',
+    listen: 'Écouter',
+    pauseAudio: 'Pause',
+    resumeAudio: 'Reprendre',
+    stopAudio: 'Arrêter',
+    listening: 'Lecture à voix haute',
+    print: 'Imprimer',
+    moreShare: 'Autres options de partage',
+    browse: 'Parcourir les derniers articles',
+  },
 };
 
 const tr: Dict = {
@@ -543,6 +577,23 @@ const tr: Dict = {
     },
   },
   notFound: { title: 'Sayfa bulunamadı', text: 'Aradığınız sayfa mevcut değil veya taşınmış olabilir.' },
+  tools: {
+    save: 'Kaydet',
+    saved: 'Kaydedildi',
+    savedStories: 'Kaydedilen haberler',
+    savedIntro: 'Kaydettiğiniz haberler bu cihazda saklanır; daha sonra geri dönebilirsiniz.',
+    savedEmpty: 'Henüz haber kaydetmediniz. Herhangi bir haberdeki Kaydet düğmesini kullanarak onu burada saklayabilirsiniz.',
+    remove: 'Kaldır',
+    clearAll: 'Tümünü kaldır',
+    listen: 'Dinle',
+    pauseAudio: 'Duraklat',
+    resumeAudio: 'Devam et',
+    stopAudio: 'Durdur',
+    listening: 'Sesli okunuyor',
+    print: 'Yazdır',
+    moreShare: 'Diğer paylaşım seçenekleri',
+    browse: 'Son haberlere göz atın',
+  },
 };
 
 const ar: Dict = {
@@ -719,6 +770,23 @@ const ar: Dict = {
     },
   },
   notFound: { title: 'الصفحة غير موجودة', text: 'الصفحة التي تبحث عنها غير موجودة أو تم نقلها.' },
+  tools: {
+    save: 'حفظ',
+    saved: 'محفوظ',
+    savedStories: 'المقالات المحفوظة',
+    savedIntro: 'تُحفظ المقالات على هذا الجهاز لتعود إليها لاحقاً.',
+    savedEmpty: 'لم تحفظ أي مقال بعد. استخدم زر «حفظ» في أي مقال للاحتفاظ به هنا.',
+    remove: 'إزالة',
+    clearAll: 'إزالة الكل',
+    listen: 'استمع',
+    pauseAudio: 'إيقاف مؤقت',
+    resumeAudio: 'متابعة',
+    stopAudio: 'إيقاف',
+    listening: 'قراءة صوتية',
+    print: 'طباعة',
+    moreShare: 'خيارات مشاركة أخرى',
+    browse: 'تصفّح آخر المقالات',
+  },
 };
 
 export const STRINGS: Record<Lang, Dict> = { en, fr, tr, ar };

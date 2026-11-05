@@ -29,6 +29,7 @@ npm run build     # static site in dist/ — deploy to any static host
 | Video | `#/en/video` | Media modal (YouTube embed when `youtubeId` is set) |
 | Article | `#/en/article/<slug>` | Breadcrumb, kicker, headline, sub-headline, author portrait, published and updated dates, reading time, progress bar, captioned lead image with credit, sticky share rail (X, Facebook, WhatsApp, LinkedIn, copy link), table of contents, pull quotes, inline figures and charts, **Why this matters**, author bio, Read next, Related |
 | Author | `#/en/author/<id>` | Bio and articles |
+| Saved | `#/en/saved` | Stories the reader saved, kept in their browser |
 | About | `#/en/about` (`#team`, `#contact`) | Mission, principles, team, contact form |
 | Policies | `#/en/page/corrections` · `privacy` · `terms` | Templates to review before launch |
 
@@ -41,6 +42,13 @@ Global elements:
 - **Mobile:** a drawer menu that opens from the right in Arabic.
 - **Newsletter:** "Africa, seen closer."
 - **Footer:** a navy footer.
+
+Reader tools:
+- **Save:** a bookmark button on every article and story card. Saved stories appear at `#/…/saved`, with a count on the bookmark icon in the masthead. They are stored in the reader's browser only.
+- **Listen:** reads the article aloud using the device's built-in voices. The button only appears when the device has a voice for the current language.
+- **Print:** prints just the story, without menus, sharing or related links.
+- **Share:** on phones an extra button opens the phone's own share menu.
+- **Install:** a web app manifest lets readers add the site to their home screen.
 
 Switching language keeps the reader on the same page. Old URLs `#/…/sahel` and `#/…/videos` redirect automatically.
 

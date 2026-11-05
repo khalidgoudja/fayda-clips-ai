@@ -1,6 +1,7 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react';
-import { Check, Mail, Send } from 'lucide-react';
-import { AFRICA_REGIONS, ANALYSIS_FORMATS, AUTHORS, MEDIA, SITE, sortedArticles, type Article, type AuthorId, type Format, type Media, type MediaType, type Region, type Topic } from '../data';
+import { Bookmark, Check, Mail, Send } from 'lucide-react';
+import { useSaved } from '../saved';
+import { AFRICA_REGIONS, ANALYSIS_FORMATS, AUTHORS, MEDIA, SITE, getArticle, sortedArticles, type Article, type AuthorId, type Format, type Media, type MediaType, type Region, type Topic } from '../data';
 import { useI18n } from '../i18n';
 import { Link } from '../router';
 import { Avatar, Chips, Cover, Logo, MediaCard, SocialLinks, StoryCard, StoryRow } from '../components/ui';
@@ -437,5 +438,45 @@ export function NotFound() {
         {t.ui.backHome}
       </Link>
     </Wrap>
+  );
+}
+
+/* ── Saved stories (kept in this browser) ── */
+export function SavedPage() {
+  const { t } = useI18n();
+  const { saved, clear } = useSaved();
+  const items = saved.map((s) => getArticle(s)).filter((a): a is Article => Boolean(a));
+  return (
+    <>
+      <PageHero kicker={t.tools.saved} title={t.tools.savedStories} intro={t.tools.savedIntro}>
+        {items.length > 0 && (
+          <div className="flex flex-wrap items-center gap-4 text-sm">
+            <span className="font-semibold text-heading tabular-nums">
+              {items.length} {t.ui.stories}
+            </span>
+            <button type="button" onClick={clear} className="font-medium text-muted underline-offset-4 hover:text-heading hover:underline">
+              {t.tools.clearAll}
+            </button>
+          </div>
+        )}
+      </PageHero>
+      <Wrap className="py-12">
+        {items.length ? (
+          <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((a) => (
+              <StoryCard key={a.slug} a={a} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center border border-dashed border-line px-6 py-16 text-center">
+            <Bookmark size={30} className="text-emerald" aria-hidden />
+            <p className="mt-4 max-w-md text-muted">{t.tools.savedEmpty}</p>
+            <Link to="/" className="mt-7 bg-navy px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-700 dark:bg-emerald dark:text-navy">
+              {t.tools.browse}
+            </Link>
+          </div>
+        )}
+      </Wrap>
+    </>
   );
 }

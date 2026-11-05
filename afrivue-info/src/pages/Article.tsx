@@ -5,6 +5,7 @@ import { formatDate, useI18n } from '../i18n';
 import { Link } from '../router';
 import { Avatar, Cover, Kicker, ShareButtons, StoryCard, useLabels } from '../components/ui';
 import { navPath } from '../components/layout';
+import { ListenButton, PrintButton, SaveButton } from '../components/ArticleTools';
 
 const SIZES = ['text-[17px]', 'text-[18.5px]', 'text-[20px]', 'text-[22px]'];
 const isH = (b: Block): b is { h: string } => typeof b === 'object' && 'h' in b;
@@ -203,12 +204,15 @@ export function ArticlePage({ a }: { a: Article }) {
 
   return (
     <>
-      <div className="fixed inset-x-0 top-0 z-[45] h-[3px]" aria-hidden>
+      <div className="fixed inset-x-0 top-0 z-[45] h-[3px]" aria-hidden data-noprint>
         <div className="h-full bg-emerald transition-[width] duration-100" style={{ width: `${progress * 100}%` }} />
       </div>
 
       <article className="mx-auto max-w-[1320px] px-4 pt-6 sm:px-6 sm:pt-10" lang={lang}>
-        <nav aria-label={t.article.breadcrumb} className="mx-auto max-w-[760px]">
+        <p className="mx-auto mb-6 hidden max-w-[760px] border-b border-line pb-3 text-[10pt] text-muted print:block">
+          <strong className="text-heading">AfriVue Info</strong> · {window.location.href}
+        </p>
+        <nav aria-label={t.article.breadcrumb} className="mx-auto max-w-[760px]" data-noprint>
           <ol className="flex flex-wrap items-center gap-1.5 text-[13px] text-muted">
             {crumbs.map(([l, to], i) => (
               <li key={to + i} className="flex items-center gap-1.5">
@@ -250,7 +254,7 @@ export function ArticlePage({ a }: { a: Article }) {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1" role="group" aria-label={t.ui.textSize}>
+            <div className="flex items-center gap-1" role="group" aria-label={t.ui.textSize} data-noprint>
               <span className="kicker me-2 text-muted">{t.ui.textSize}</span>
               <button type="button" onClick={() => setSize((s) => Math.max(0, s - 1))} disabled={size === 0} className="grid h-8 w-8 place-items-center rounded-full border border-line text-heading hover:border-navy disabled:opacity-35" aria-label={`${t.ui.textSize} −`}>
                 <Minus size={14} />
@@ -259,6 +263,11 @@ export function ArticlePage({ a }: { a: Article }) {
                 <Plus size={14} />
               </button>
             </div>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2" data-noprint>
+            <SaveButton slug={a.slug} />
+            <ListenButton a={a} />
+            <PrintButton />
           </div>
           <p className="mt-3 text-[12.5px] text-muted">{t.demo.articleNote}</p>
         </header>
@@ -274,20 +283,20 @@ export function ArticlePage({ a }: { a: Article }) {
         </figure>
 
         <div className="mx-auto mt-10 grid max-w-[1180px] gap-8 lg:grid-cols-[56px_minmax(0,1fr)_240px] lg:gap-12">
-          <div className="hidden lg:block">
+          <div className="hidden lg:block" data-noprint>
             <div className="sticky top-24">
               <ShareButtons title={c.title} vertical />
             </div>
           </div>
 
           <div id="article-body" className="mx-auto w-full max-w-[700px]">
-            <div className="mb-8 lg:hidden">
+            <div className="mb-8 lg:hidden" data-noprint>
               <ShareButtons title={c.title} />
             </div>
             {hasToc && <Toc items={headings} active={active} compact />}
             <div className={`article-body font-reading leading-[1.75] text-fg ${SIZES[size]}`}>{blocks}</div>
 
-            <div className="mt-12 border-t border-line pt-6">
+            <div className="mt-12 border-t border-line pt-6" data-noprint>
               <ShareButtons title={c.title} />
             </div>
 
@@ -309,7 +318,7 @@ export function ArticlePage({ a }: { a: Article }) {
             </section>
           </div>
 
-          <aside className="hidden lg:block">
+          <aside className="hidden lg:block" data-noprint>
             <div className="sticky top-24">{hasToc && <Toc items={headings} active={active} />}</div>
           </aside>
         </div>
@@ -317,7 +326,7 @@ export function ArticlePage({ a }: { a: Article }) {
 
       {/* Read next */}
       {next && (
-        <section aria-labelledby="next-h" className="mx-auto mt-16 max-w-[1320px] px-4 sm:px-6">
+        <section data-noprint aria-labelledby="next-h" className="mx-auto mt-16 max-w-[1320px] px-4 sm:px-6">
           <div className="border-t-[3px] border-navy pt-4 dark:border-emerald">
             <h2 id="next-h" className="kicker text-heading">
               {t.article.readNext}
@@ -334,7 +343,7 @@ export function ArticlePage({ a }: { a: Article }) {
         </section>
       )}
 
-      <section aria-labelledby="related-h" className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6">
+      <section data-noprint aria-labelledby="related-h" className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6">
         <div className="mb-7 border-t-[3px] border-navy pt-4 dark:border-emerald">
           <h2 id="related-h" className="font-display text-2xl font-bold text-heading">
             {t.article.related}

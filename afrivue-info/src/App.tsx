@@ -5,7 +5,7 @@ import { useRoute } from './router';
 import { BackToTop, Footer, Masthead, MobileMenu, Newsletter, PrimaryNav, SearchOverlay, Ticker, UtilityBar, type NavKey } from './components/layout';
 import { Home } from './pages/Home';
 import { ArticlePage } from './pages/Article';
-import { AboutPage, AfricaPage, AnalysisPage, AuthorPage, ChadPage, InDepthPage, MediaModal, NotFound, PolicyPage, TopicPage, VideoPage } from './pages/Pages';
+import { AboutPage, AfricaPage, AnalysisPage, AuthorPage, ChadPage, InDepthPage, MediaModal, NotFound, PolicyPage, SavedPage, TopicPage, VideoPage } from './pages/Pages';
 
 const TOPICS: Topic[] = ['politics', 'economy', 'society', 'development', 'culture', 'sports', 'technology'];
 /** Old URLs from the first version of the site keep working */
@@ -127,6 +127,9 @@ export default function App() {
     page = <AboutPage />;
     active = 'about';
     title = t.about.title;
+  } else if (p0 === 'saved') {
+    page = <SavedPage />;
+    title = t.tools.savedStories;
   } else if (p0 === 'author' && p1 && p1 in AUTHORS) {
     page = <AuthorPage key={p1} id={p1 as AuthorId} />;
     title = AUTHORS[p1 as AuthorId].name[lang];

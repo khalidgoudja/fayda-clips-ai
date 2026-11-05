@@ -1,8 +1,10 @@
 import { useId, useState, type ReactNode } from 'react';
-import { Camera, Check, Headphones, Link2, Mic, Play } from 'lucide-react';
+import { Camera, Check, Headphones, Link2, Mic, Play, Share2 } from 'lucide-react';
 import { AUTHORS, SITE, type Art, type Article, type Author, type Media, type Region } from '../data';
 import { formatDate, useI18n } from '../i18n';
 import { Link } from '../router';
+import { useSaved } from '../saved';
+import { SaveButton } from './ArticleTools';
 
 /* ═════════════ Logo ═════════════ */
 const V_PATH = 'M58 2H84L104 50L124 2H150L112 90H96Z';
@@ -305,6 +307,16 @@ export function Chips<T extends string>({ value, options, onChange, label, light
 /* ═════════════ Story cards ═════════════ */
 type CardVariant = 'standard' | 'compact' | 'feature';
 
+/** Bookmark in the corner of a card image: always shown once saved, otherwise on hover or keyboard focus */
+function SaveOverlay({ slug }: { slug: string }) {
+  const { isSaved } = useSaved();
+  return (
+    <div className={`absolute end-2.5 top-2.5 transition-opacity ${isSaved(slug) ? 'opacity-100' : 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100'}`} data-noprint>
+      <SaveButton slug={slug} compact />
+    </div>
+  );
+}
+
 export function StoryCard({ a, variant = 'standard', excerpt = true, light = false, hideRegion = false }: { a: Article; variant?: CardVariant; excerpt?: boolean; light?: boolean; hideRegion?: boolean }) {
   const { lang } = useI18n();
   const c = a.i18n[lang];
@@ -316,9 +328,12 @@ export function StoryCard({ a, variant = 'standard', excerpt = true, light = fal
   }[variant];
   return (
     <article className="group fade-in flex flex-col">
-      <Link to={`/article/${a.slug}`} tabIndex={-1} aria-hidden className="block">
-        <Cover art={a.art} region={a.region} image={a.image} className={ratio} />
-      </Link>
+      <div className="relative">
+        <Link to={`/article/${a.slug}`} tabIndex={-1} aria-hidden className="block">
+          <Cover art={a.art} region={a.region} image={a.image} className={ratio} />
+        </Link>
+        <SaveOverlay slug={a.slug} />
+      </div>
       <div className="pt-3.5">
         <Kicker a={a} light={light} hideRegion={hideRegion} />
         <h3 className={`font-display mt-1.5 font-semibold ${title} ${light ? 'text-white' : 'text-heading'}`}>
@@ -456,6 +471,7 @@ export function ShareButtons({ title, vertical = false }: { title: string; verti
   const [copied, setCopied] = useState(false);
   const url = window.location.href;
   const e = encodeURIComponent;
+  const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(url);
@@ -480,6 +496,11 @@ export function ShareButtons({ title, vertical = false }: { title: string; verti
           <Icon s={14} />
         </a>
       ))}
+      {canNativeShare && (
+        <button type="button" className={`${btn} sm:hidden`} onClick={() => navigator.share({ title, url }).catch(() => undefined)} aria-label={t.tools.moreShare} title={t.tools.moreShare}>
+          <Share2 size={15} />
+        </button>
+      )}
       <button type="button" className={btn} onClick={copy} aria-label={t.ui.copyLink} title={t.ui.copyLink}>
         {copied ? <Check size={15} className="text-emerald" /> : <Link2 size={15} />}
       </button>

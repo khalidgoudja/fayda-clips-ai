@@ -185,3 +185,19 @@ html[lang="ar"] .article-body > p:first-of-type::first-letter {
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
+
+/* ── Print: just the story, in black on white ── */
+@media print {
+  @page { margin: 18mm 16mm; }
+  #root > :not(main),
+  [data-noprint] { display: none !important; }
+  html, body, .dark body { background: #fff !important; color: #111 !important; }
+  :root, .dark { --bg: #fff; --surface: #fff; --fg: #111; --muted: #444; --line: #ccc; --heading: #000; --accent: #027a57; }
+  main { min-height: 0 !important; }
+  .article-body { font-size: 11.5pt !important; line-height: 1.6 !important; }
+  .article-body a::after { content: " (" attr(href) ")"; font-size: 9pt; color: #555; }
+  h1, h2, h3, figure, blockquote, aside { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  img, svg { max-width: 100% !important; }
+  .fade-in { animation: none !important; }
+}

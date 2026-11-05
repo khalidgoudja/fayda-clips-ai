@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { ArrowUp, ChevronLeft, ChevronRight, Mail, Menu, Moon, Pause, Play, Search, Sun, X } from 'lucide-react';
+import { ArrowUp, Bookmark, ChevronLeft, ChevronRight, Mail, Menu, Moon, Pause, Play, Search, Sun, X } from 'lucide-react';
 import { ARTICLES, SITE, byDate } from '../data';
 import { LANGS, LANG_META, formatDate, formatTime, useI18n } from '../i18n';
 import { Link } from '../router';
 import { Cover, Logo, LogoMark, SocialLinks } from './ui';
+import { useSaved } from '../saved';
 
 export const NAV = ['home', 'chad', 'africa', 'politics', 'economy', 'society', 'culture', 'sports', 'technology', 'analysis', 'indepth', 'video'] as const;
 export type NavKey = (typeof NAV)[number] | 'about' | 'development';
@@ -74,6 +75,23 @@ export function UtilityBar({ dark, onToggleTheme }: { dark: boolean; onToggleThe
 }
 
 /* ── Masthead ── */
+/** Bookmark icon with a count of saved stories */
+function SavedLink() {
+  const { t } = useI18n();
+  const { saved } = useSaved();
+  const n = saved.length;
+  return (
+    <Link to="/saved" className="relative grid h-10 w-10 place-items-center text-heading hover:text-accent" aria-label={n ? `${t.tools.savedStories} (${n})` : t.tools.savedStories} title={t.tools.savedStories}>
+      <Bookmark size={20} aria-hidden />
+      {n > 0 && (
+        <span className="absolute end-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-emerald-700 px-1 text-[10px] font-semibold leading-none text-white tabular-nums" dir="ltr" aria-hidden>
+          {n}
+        </span>
+      )}
+    </Link>
+  );
+}
+
 export function Masthead({ onSearch, onMenu }: { onSearch: () => void; onMenu: () => void }) {
   const { t, lang } = useI18n();
   const today = formatDate(new Date().toISOString(), lang, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -93,6 +111,7 @@ export function Masthead({ onSearch, onMenu }: { onSearch: () => void; onMenu: (
           <Logo />
         </Link>
         <div className="flex items-center justify-end gap-2">
+          <SavedLink />
           <button type="button" onClick={onSearch} className="-me-2 grid h-10 w-10 place-items-center text-heading sm:me-0" aria-label={t.ui.search} aria-keyshortcuts="/">
             <Search size={21} />
           </button>
@@ -258,6 +277,12 @@ export function MobileMenu({ open, onClose, active }: { open: boolean; onClose: 
               </Link>
             </li>
           ))}
+          <li className="mt-2 border-t border-white/10 pt-2">
+            <Link to="/saved" onClick={onClose} className="flex items-center gap-3 px-3 py-3 text-[15px] font-medium text-white/90 hover:text-white">
+              <Bookmark size={17} className="opacity-70" aria-hidden />
+              {t.tools.savedStories}
+            </Link>
+          </li>
         </ul>
         <div className="border-t border-white/10 px-4 py-4">
           <SocialLinks itemClass="h-9 w-9 opacity-80 hover:opacity-100" />
