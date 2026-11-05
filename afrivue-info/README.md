@@ -56,9 +56,10 @@ Switching language keeps the reader on the same page. Old URLs `#/…/sahel` and
 
 - **Colours:** Deep Navy `#0B2545` for authority. Emerald `#03A677` for accents, active states and the logo V; it darkens to `#027A57` for text on light backgrounds. Terracotta is used only for the breaking label. The background is warm off-white `#F8F6F1`.
 - **Type:**
-  - **Source Serif 4** for headlines and article text.
-  - **Poppins** for the interface, labels and the logo.
-  - **Cairo** for Arabic headlines and interface text, and **Noto Naskh Arabic** for Arabic long-form reading.
+  - **Newsreader**, a typeface designed for news, for headlines and article text (English, French, Turkish).
+  - **IBM Plex Sans** for the interface and labels.
+  - **Noto Kufi Arabic** for Arabic headlines and **IBM Plex Sans Arabic** for Arabic text and interface, in the clean modern style of major Arabic news sites.
+  - **Poppins** only for the logo wordmark.
 - **Motion:** gentle headline underline, a 3% image zoom, fade-ins and a sticky-nav shadow. All motion is turned off for users who set reduced motion.
 - **Where to find things:**
   - Design tokens: `src/index.css`.

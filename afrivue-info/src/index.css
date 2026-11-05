@@ -5,10 +5,13 @@
 /* ── AfriVue Info design tokens ── */
 @theme {
   /* UI / labels (brand) · editorial headlines + reading (serif) · Arabic */
-  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
-  --font-arabic: "Cairo", "Tajawal", ui-sans-serif, system-ui, sans-serif;
-  --font-naskh: "Noto Naskh Arabic", "Amiri", serif;
+  /* Latin: Newsreader (a typeface drawn for news) for headlines and reading, IBM Plex Sans for the interface */
+  --font-sans: "IBM Plex Sans", "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
+  /* Arabic: Noto Kufi Arabic for headlines, IBM Plex Sans Arabic for text and interface (a modern news style) */
+  --font-arabic: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, ui-sans-serif, system-ui, sans-serif;
+  --font-arabic-display: "Noto Kufi Arabic", "IBM Plex Sans Arabic", Tahoma, sans-serif;
+  --font-brand: "Poppins", ui-sans-serif, system-ui, sans-serif;
 
   --color-navy: #0b2545;
   --color-navy-800: #0f2e52;
@@ -70,20 +73,27 @@ body {
 .font-display {
   font-family: var(--font-serif);
   font-optical-sizing: auto;
-  letter-spacing: -0.012em;
+  letter-spacing: -0.015em;
 }
 .font-reading {
   font-family: var(--font-serif);
+  font-optical-sizing: auto;
 }
 
-/* Arabic edition: Cairo for UI & headlines, Naskh for long reading */
+/* Arabic edition: Kufi headlines, Plex Sans Arabic for text and interface */
 html[lang="ar"] body,
-html[lang="ar"] .font-display {
+html[lang="ar"] .font-reading {
   font-family: var(--font-arabic);
   letter-spacing: 0;
 }
+html[lang="ar"] .font-display {
+  font-family: var(--font-arabic-display);
+  letter-spacing: 0;
+  line-height: 1.5;
+  font-weight: 700;
+}
 html[lang="ar"] .font-reading {
-  font-family: var(--font-naskh);
+  line-height: 1.95;
 }
 
 ::selection {
@@ -201,3 +211,6 @@ html[lang="ar"] .article-body > p:first-of-type::first-letter {
   img, svg { max-width: 100% !important; }
   .fade-in { animation: none !important; }
 }
+
+/* Arabic has no true italic: keep it upright */
+html[lang="ar"] .italic { font-style: normal; }

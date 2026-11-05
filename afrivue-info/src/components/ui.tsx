@@ -36,7 +36,7 @@ export function Logo({ size = 'md', reversed = false, tag = true }: { size?: 'sm
   }[size];
   const color = reversed ? 'text-white' : 'text-navy dark:text-white';
   return (
-    <span dir="ltr" className={`inline-flex items-center leading-none select-none ${s.gap}`} style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <span dir="ltr" className={`inline-flex items-center leading-none select-none ${s.gap}`} style={{ fontFamily: 'var(--font-brand)' }}>
       <LogoMark reversed={reversed} className={`${s.mark} w-auto shrink-0`} />
       <span className={`inline-flex flex-col items-center ${color}`}>
         <span className={`${s.word} font-bold tracking-[-0.02em]`}>AfriVue</span>
@@ -235,7 +235,7 @@ export function Avatar({ author, size = 'md', ring = false }: { author: Author; 
   return (
     <span
       className={`grid shrink-0 place-items-center rounded-full font-semibold text-white ${cls} ${ring ? 'ring-2 ring-white/20' : ''}`}
-      style={{ background: author.tone, fontFamily: 'Poppins, sans-serif' }}
+      style={{ background: author.tone, fontFamily: 'var(--font-brand)' }}
       role="img"
       aria-label={author.name[lang]}
       dir="ltr"
